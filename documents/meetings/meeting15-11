@@ -1,0 +1,11 @@
+- Kijken hoe/wat mobilab wil qua hosting voor data en webapp
+- Kijken of we pubsub nodig hebben
+- Kijken voor locale database in mobile app als er geen internet
+- App in 2 delen
+    - proxy app (doorsturen data)
+    - Check app (data goed aangekomen?)
+
+3 onderdelen:
+- Data sensoren(mock) al eens in een MySQL database voor Dashboard zodat we verder kunnen met POC
+- Proxy focus op Android en doorsturen naar DataBase waarschijnlijk via PubSub
+- Welke datastore gebruiken en hoe zit het met de healthcheck (of data correct is doorgekomen)
