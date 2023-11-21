@@ -1,5 +1,9 @@
 name: Build
 
+defaults:
+ run:
+  working-directory: ./code/monitoringapplicatie
+
 on:
   push:
     branches: [ "main" ]
