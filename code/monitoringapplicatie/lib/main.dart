@@ -55,7 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // Get battery level.
   String _batteryLevel = 'Unknown battery level.';
-
+  String _movellaStatusStopped = 'Unknown';
   String _movellaStatus = 'Unknown';
 
   Future<void> _getBatteryLevel() async {
@@ -86,6 +86,21 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  Future<void> _stopMovella() async {
+    String movellaStatusStopped;
+    try {
+      final result = await platform.invokeMethod<String>('movella_stop');
+      movellaStatusStopped = '$result';
+    } on PlatformException catch (e) {
+      movellaStatusStopped =
+          "Failed to get movella status stopped: '${e.message}'.";
+    }
+
+    setState(() {
+      _movellaStatus = movellaStatusStopped;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -103,6 +118,10 @@ class _MyHomePageState extends State<MyHomePage> {
               child: const Text('Get movella status'),
             ),
             Text(_movellaStatus),
+            ElevatedButton(
+              onPressed: _stopMovella,
+              child: const Text('Stop searching'),
+            ),
           ],
         ),
       ),
