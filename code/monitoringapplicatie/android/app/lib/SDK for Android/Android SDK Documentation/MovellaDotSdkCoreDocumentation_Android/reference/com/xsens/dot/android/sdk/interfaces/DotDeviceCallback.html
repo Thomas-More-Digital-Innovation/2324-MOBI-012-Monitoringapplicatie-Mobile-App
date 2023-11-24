@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+  <meta name="description" content="Javadoc API documentation for Movella DOT Android SDK version 2023.6.0." />
+
+<link rel="shortcut icon" type="image/x-icon" href="../../../../../../favicon.ico" />
+<title>
+
+  DotDeviceCallback
+
+
+| Movella DOT Android SDK version 2023.6.0
+
+</title>
+<link href="../../../../../../../assets/doclava-developer-docs.css" rel="stylesheet" type="text/css" />
+<link href="../../../../../../../assets/customizations.css" rel="stylesheet" type="text/css" />
+<script src="../../../../../../../assets/search_autocomplete.js" type="text/javascript"></script>
+<script src="../../../../../../../assets/jquery-resizable.min.js" type="text/javascript"></script>
+<script src="../../../../../../../assets/doclava-developer-docs.js" type="text/javascript"></script>
+<script src="../../../../../../../assets/prettify.js" type="text/javascript"></script>
+<script type="text/javascript">
+  setToRoot("../../../../../../", "../../../../../../../assets/");
+</script>
+<script src="../../../../../../../assets/doclava-developer-reference.js" type="text/javascript"></script>
+<script src="../../../../../../../assets/navtree_data.js" type="text/javascript"></script>
+<script src="../../../../../../../assets/customizations.js" type="text/javascript"></script>
+<noscript>
+  <style type="text/css">
+    html,body{overflow:auto;}
+    #body-content{position:relative; top:0;}
+    #doc-content{overflow:visible;border-left:3px solid #666;}
+    #side-nav{padding:0;}
+    #side-nav .toggle-list ul {display:block;}
+    #resize-packages-nav{border-bottom:3px solid #666;}
+  </style>
+</noscript>
+</head>
+
+<body class="">
+
+<div id="header">
+    <div id="headerLeft">
+    
+      <span id="masthead-title">Movella DOT Android SDK version 2023.6.0</span>
+    
+    </div>
+    <div id="headerRight">
+      
+  <div id="search" >
+      <div id="searchForm">
+          <form accept-charset="utf-8" class="gsc-search-box" 
+                onsubmit="return submit_search()">
+            <table class="gsc-search-box" cellpadding="0" cellspacing="0"><tbody>
+                <tr>
+                  <td class="gsc-input">
+                    <input id="search_autocomplete" class="gsc-input" type="text" size="33" autocomplete="off"
+                      title="search developer docs" name="q"
+                      value="search developer docs"
+                      onFocus="search_focus_changed(this, true)"
+                      onBlur="search_focus_changed(this, false)"
+                      onkeydown="return search_changed(event, true, '../../../../../../')"
+                      onkeyup="return search_changed(event, false, '../../../../../../')" />
+                  <div id="search_filtered_div" class="no-display">
+                      <table id="search_filtered" cellspacing=0>
+                      </table>
+                  </div>
+                  </td>
+                  <td class="gsc-search-button">
+                    <input type="submit" value="Search" title="search" id="search-button" class="gsc-search-button" />
+                  </td>
+                  <td class="gsc-clear-button">
+                    <div title="clear results" class="gsc-clear-button">&nbsp;</div>
+                  </td>
+                </tr></tbody>
+              </table>
+          </form>
+      </div><!-- searchForm -->
+  </div><!-- search -->
+      
+    </div>
+</div><!-- header -->
+
+
+  <div class="g-section g-tpl-240" id="body-content">
+    <div class="g-unit g-first side-nav-resizable" id="side-nav">
+      <div id="swapper">
+        <div id="nav-panels">
+          <div id="resize-packages-nav">
+            <div id="packages-nav">
+              <div id="index-links">
+                <a href="../../../../../../packages.html"  >Package Index</a> | 
+                <a href="../../../../../../classes.html" >Class Index</a>
+              </div>
+              <ul>
+                
+    <li class="api apilevel-">
+  <a href="../../../../../../com/xsens/dot/android/sdk/package-summary.html">com.xsens.dot.android.sdk</a></li>
+    <li class="api apilevel-">
+  <a href="../../../../../../com/xsens/dot/android/sdk/events/package-summary.html">com.xsens.dot.android.sdk.events</a></li>
+    <li class="selected api apilevel-">
+  <a href="../../../../../../com/xsens/dot/android/sdk/interfaces/package-summary.html">com.xsens.dot.android.sdk.interfaces</a></li>
+    <li class="api apilevel-">
+  <a href="../../../../../../com/xsens/dot/android/sdk/models/package-summary.html">com.xsens.dot.android.sdk.models</a></li>
+    <li class="api apilevel-">
+  <a href="../../../../../../com/xsens/dot/android/sdk/recording/package-summary.html">com.xsens.dot.android.sdk.recording</a></li>
+    <li class="api apilevel-">
+  <a href="../../../../../../com/xsens/dot/android/sdk/settings/package-summary.html">com.xsens.dot.android.sdk.settings</a></li>
+    <li class="api apilevel-">
+  <a href="../../../../../../com/xsens/dot/android/sdk/utils/package-summary.html">com.xsens.dot.android.sdk.utils</a></li>
+              </ul><br/>
+            </div> <!-- end packages -->
+          </div> <!-- end resize-packages -->
+          <div id="classes-nav">
+            <ul>
+              
+    <li><h2>Interfaces</h2>
+      <ul>
+          <li class="api apilevel-"><a href="../../../../../../com/xsens/dot/android/sdk/interfaces/DotCiCallback.html">DotCiCallback</a></li>
+          <li class="selected api apilevel-"><a href="../../../../../../com/xsens/dot/android/sdk/interfaces/DotDeviceCallback.html">DotDeviceCallback</a></li>
+          <li class="api apilevel-"><a href="../../../../../../com/xsens/dot/android/sdk/interfaces/DotMeasurementCallback.html">DotMeasurementCallback</a></li>
+          <li class="api apilevel-"><a href="../../../../../../com/xsens/dot/android/sdk/interfaces/DotRecordingCallback.html">DotRecordingCallback</a></li>
+          <li class="api apilevel-"><a href="../../../../../../com/xsens/dot/android/sdk/interfaces/DotScannerCallback.html">DotScannerCallback</a></li>
+          <li class="api apilevel-"><a href="../../../../../../com/xsens/dot/android/sdk/interfaces/DotSyncCallback.html">DotSyncCallback</a></li>
+          <li class="api apilevel-"><a href="../../../../../../com/xsens/dot/android/sdk/interfaces/SettingsCallback.html">SettingsCallback</a></li>
+      </ul>
+    </li>
+              
+              
+              
+              
+              
+            </ul><br/>
+          </div><!-- end classes -->
+        </div><!-- end nav-panels -->
+        <div id="nav-tree" style="display:none">
+          <div id="index-links">
+            <a href="../../../../../../packages.html"  >Package Index</a> | 
+            <a href="../../../../../../classes.html" >Class Index</a>
+          </div>
+        </div><!-- end nav-tree -->
+      </div><!-- end swapper -->
+    </div> <!-- end side-nav -->
+    <script>
+      if (!isMobile) {
+        $("<a href='#' id='nav-swap' onclick='swapNav();return false;' style='font-size:10px;line-height:9px;margin-left:1em;text-decoration:none;'><span id='tree-link'>Use Tree Navigation</span><span id='panel-link' style='display:none'>Use Panel Navigation</span></a>").appendTo("#side-nav");
+        chooseDefaultNav();
+        if ($("#nav-tree").is(':visible')) {
+          init_default_navtree("../../../../../../");
+        } else {
+          addLoadEvent(function() {
+            scrollIntoView("packages-nav");
+            scrollIntoView("classes-nav");
+          });
+        }
+        $("#swapper").css({borderBottom:"2px solid #aaa"});
+      } else {
+        swapNav(); // tree view should be used on mobile
+      }
+    </script>
+
+
+
+<div class="g-unit" id="doc-content">
+
+<div id="api-info-block">
+
+
+
+
+<div class="sum-details-links">
+
+
+</div><!-- end sum-details-links -->
+<div class="api-level">
+  
+
+
+  
+  
+
+</div>
+</div><!-- end api-info-block -->
+
+
+<!-- ======== START OF CLASS DATA ======== -->
+
+<div id="jd-header">
+    public
+     
+     
+    
+    interface
+<h1>DotDeviceCallback</h1>
+
+
+
+  
+  
+  
+
+
+</div><!-- end header -->
+
+<div id="naMessage"></div>
+
+<div id="jd-content" class="api apilevel-">
+<table class="jd-inheritance-table">
+
+
+    <tr>
+         	
+        <td colspan="1" class="jd-inheritance-class-cell">com.xsens.dot.android.sdk.interfaces.DotDeviceCallback</td>
+    </tr>
+    
+
+</table>
+
+
+
+
+
+
+
+<div class="jd-descr">
+
+
+<h2>Class Overview</h2>
+<p>An interface for notifying device status and data.
+</p>
+
+
+
+
+
+</div><!-- jd-descr -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="jd-descr">
+
+
+<h2>Summary</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- ========== METHOD SUMMARY =========== -->
+<table id="pubmethods" class="jd-sumtable"><tr><th colspan="12">Public Methods</th></tr>
+
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol">
+            abstract
+            
+            
+            
+            
+            void
+        </td>
+        <td class="jd-linkcol" width="100%">
+        <span class="sympad"><a href="../../../../../../com/xsens/dot/android/sdk/interfaces/DotDeviceCallback.html#onDotBatteryChanged(java.lang.String, int, int)">onDotBatteryChanged</a></span>(String address, int status, int percentage)
+        
+        <div class="jd-descrdiv">This function will be triggered when the battery status and percentage are changed.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol">
+            abstract
+            
+            
+            
+            
+            void
+        </td>
+        <td class="jd-linkcol" width="100%">
+        <span class="sympad"><a href="../../../../../../com/xsens/dot/android/sdk/interfaces/DotDeviceCallback.html#onDotButtonClicked(java.lang.String, long)">onDotButtonClicked</a></span>(String address, long timestamp)
+        
+        <div class="jd-descrdiv">This function will be triggered when the device's button is clicked.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol">
+            abstract
+            
+            
+            
+            
+            void
+        </td>
+        <td class="jd-linkcol" width="100%">
+        <span class="sympad"><a href="../../../../../../com/xsens/dot/android/sdk/interfaces/DotDeviceCallback.html#onDotConnectionChanged(java.lang.String, int)">onDotConnectionChanged</a></span>(String address, int state)
+        
+        <div class="jd-descrdiv">This function will be triggered when the device's connection state is changed.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol">
+            abstract
+            
+            
+            
+            
+            void
+        </td>
+        <td class="jd-linkcol" width="100%">
+        <span class="sympad"><a href="../../../../../../com/xsens/dot/android/sdk/interfaces/DotDeviceCallback.html#onDotDataChanged(java.lang.String, com.xsens.dot.android.sdk.events.DotData)">onDotDataChanged</a></span>(String address, <a href="../../../../../../com/xsens/dot/android/sdk/events/DotData.html">DotData</a> data)
+        
+        <div class="jd-descrdiv">This function will be triggered when the device generates new data packet.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol">
+            abstract
+            
+            
+            
+            
+            void
+        </td>
+        <td class="jd-linkcol" width="100%">
+        <span class="sympad"><a href="../../../../../../com/xsens/dot/android/sdk/interfaces/DotDeviceCallback.html#onDotFilterProfileUpdate(java.lang.String, int)">onDotFilterProfileUpdate</a></span>(String address, int filterProfileIndex)
+        
+        <div class="jd-descrdiv">This function will be triggered when the current filter profile is get or changed.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol">
+            abstract
+            
+            
+            
+            
+            void
+        </td>
+        <td class="jd-linkcol" width="100%">
+        <span class="sympad"><a href="../../../../../../com/xsens/dot/android/sdk/interfaces/DotDeviceCallback.html#onDotFirmwareVersionRead(java.lang.String, java.lang.String)">onDotFirmwareVersionRead</a></span>(String address, String version)
+        
+        <div class="jd-descrdiv">This function will be triggered when the device version is read.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol">
+            abstract
+            
+            
+            
+            
+            void
+        </td>
+        <td class="jd-linkcol" width="100%">
+        <span class="sympad"><a href="../../../../../../com/xsens/dot/android/sdk/interfaces/DotDeviceCallback.html#onDotGetFilterProfileInfo(java.lang.String, java.util.ArrayList<com.xsens.dot.android.sdk.models.FilterProfileInfo>)">onDotGetFilterProfileInfo</a></span>(String address, ArrayList&lt;<a href="../../../../../../com/xsens/dot/android/sdk/models/FilterProfileInfo.html">FilterProfileInfo</a>&gt; filterProfileInfoList)
+        
+        <div class="jd-descrdiv">This function will be triggered when the filter profile properties are get.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol">
+            abstract
+            
+            
+            
+            
+            void
+        </td>
+        <td class="jd-linkcol" width="100%">
+        <span class="sympad"><a href="../../../../../../com/xsens/dot/android/sdk/interfaces/DotDeviceCallback.html#onDotInitDone(java.lang.String)">onDotInitDone</a></span>(String address)
+        
+        <div class="jd-descrdiv">This function will be triggered when the initial progress of connected device is done.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol">
+            abstract
+            
+            
+            
+            
+            void
+        </td>
+        <td class="jd-linkcol" width="100%">
+        <span class="sympad"><a href="../../../../../../com/xsens/dot/android/sdk/interfaces/DotDeviceCallback.html#onDotOutputRateUpdate(java.lang.String, int)">onDotOutputRateUpdate</a></span>(String address, int outputRate)
+        
+        <div class="jd-descrdiv">This function will be triggered when the current output rate is get or changed.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol">
+            abstract
+            
+            
+            
+            
+            void
+        </td>
+        <td class="jd-linkcol" width="100%">
+        <span class="sympad"><a href="../../../../../../com/xsens/dot/android/sdk/interfaces/DotDeviceCallback.html#onDotPowerSavingTriggered(java.lang.String)">onDotPowerSavingTriggered</a></span>(String address)
+        
+        <div class="jd-descrdiv">This function will be triggered when the device is entering power saving mode.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol">
+            abstract
+            
+            
+            
+            
+            void
+        </td>
+        <td class="jd-linkcol" width="100%">
+        <span class="sympad"><a href="../../../../../../com/xsens/dot/android/sdk/interfaces/DotDeviceCallback.html#onDotServicesDiscovered(java.lang.String, int)">onDotServicesDiscovered</a></span>(String address, int status)
+        
+        <div class="jd-descrdiv">This function will be triggered after device is connected.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol">
+            abstract
+            
+            
+            
+            
+            void
+        </td>
+        <td class="jd-linkcol" width="100%">
+        <span class="sympad"><a href="../../../../../../com/xsens/dot/android/sdk/interfaces/DotDeviceCallback.html#onDotTagChanged(java.lang.String, java.lang.String)">onDotTagChanged</a></span>(String address, String tag)
+        
+        <div class="jd-descrdiv">This function will be triggered when the device tag is changed.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class="alt-color api apilevel-" >
+        <td class="jd-typecol">
+            abstract
+            
+            
+            
+            
+            void
+        </td>
+        <td class="jd-linkcol" width="100%">
+        <span class="sympad"><a href="../../../../../../com/xsens/dot/android/sdk/interfaces/DotDeviceCallback.html#onReadRemoteRssi(java.lang.String, int)">onReadRemoteRssi</a></span>(String address, int rssi)
+        
+        <div class="jd-descrdiv">This function will be triggered when reading rssi is successful.</div>
+  
+  </td></tr>
+
+
+	 
+    <tr class=" api apilevel-" >
+        <td class="jd-typecol">
+            abstract
+            
+            
+            
+            
+            void
+        </td>
+        <td class="jd-linkcol" width="100%">
+        <span class="sympad"><a href="../../../../../../com/xsens/dot/android/sdk/interfaces/DotDeviceCallback.html#onSyncStatusUpdate(java.lang.String, boolean)">onSyncStatusUpdate</a></span>(String address, boolean isSynced)
+        
+        <div class="jd-descrdiv">This function will be triggered when the sync status is get.</div>
+  
+  </td></tr>
+
+
+
+</table>
+
+
+
+
+
+
+
+</div><!-- jd-descr (summary) -->
+
+<!-- Details -->
+
+
+
+
+
+
+
+
+<!-- XML Attributes -->
+
+
+<!-- Enum Values -->
+
+
+<!-- Constants -->
+
+
+<!-- Fields -->
+
+
+<!-- Public ctors -->
+
+
+
+<!-- ========= CONSTRUCTOR DETAIL ======== -->
+<!-- Protected ctors -->
+
+
+
+<!-- ========= METHOD DETAIL ======== -->
+<!-- Public methdos -->
+
+<h2>Public Methods</h2>
+
+
+
+<a id="onDotBatteryChanged(java.lang.String, int, int)"></a>
+
+<div class="jd-details api apilevel-"> 
+    <h4 class="jd-details-title">
+      <span class="normal">
+        public 
+         
+         
+        abstract 
+         
+        void
+      </span>
+      <span class="sympad">onDotBatteryChanged</span>
+      <span class="normal">(String address, int status, int percentage)</span>
+    </h4>
+      <div class="api-level">
+        <div>
+
+</div>
+        
+  
+
+      </div>
+    <div class="jd-details-descr">
+      
+  <div class="jd-tagdata jd-tagdescr"><p>This function will be triggered when the battery status and percentage are changed.</p></div>
+  <div class="jd-tagdata">
+      <h5 class="jd-tagtitle">Parameters</h5>
+      <table class="jd-tagtable">
+        <tr>
+          <th>address</th>
+          <td>The device mac address</td>
+        </tr>
+        <tr>
+          <th>status</th>
+          <td>This state can be one of BATT_STATE_NOT_CHARGING or BATT_STATE_CHARGING</td>
+        </tr>
+        <tr>
+          <th>percentage</th>
+          <td>The range of battery level is 0 to 100
+</td>
+        </tr>
+      </table>
+  </div>
+
+    </div>
+</div>
+
+
+<a id="onDotButtonClicked(java.lang.String, long)"></a>
+
+<div class="jd-details api apilevel-"> 
+    <h4 class="jd-details-title">
+      <span class="normal">
+        public 
+         
+         
+        abstract 
+         
+        void
+      </span>
+      <span class="sympad">onDotButtonClicked</span>
+      <span class="normal">(String address, long timestamp)</span>
+    </h4>
+      <div class="api-level">
+        <div>
+
+</div>
+        
+  
+
+      </div>
+    <div class="jd-details-descr">
+      
+  <div class="jd-tagdata jd-tagdescr"><p>This function will be triggered when the device's button is clicked.</p></div>
+  <div class="jd-tagdata">
+      <h5 class="jd-tagtitle">Parameters</h5>
+      <table class="jd-tagtable">
+        <tr>
+          <th>address</th>
+          <td>The device mac address</td>
+        </tr>
+        <tr>
+          <th>timestamp</th>
+          <td>The timestamp of click event
+</td>
+        </tr>
+      </table>
+  </div>
+
+    </div>
+</div>
+
+
+<a id="onDotConnectionChanged(java.lang.String, int)"></a>
+
+<div class="jd-details api apilevel-"> 
+    <h4 class="jd-details-title">
+      <span class="normal">
+        public 
+         
+         
+        abstract 
+         
+        void
+      </span>
+      <span class="sympad">onDotConnectionChanged</span>
+      <span class="normal">(String address, int state)</span>
+    </h4>
+      <div class="api-level">
+        <div>
+
+</div>
+        
+  
+
+      </div>
+    <div class="jd-details-descr">
+      
+  <div class="jd-tagdata jd-tagdescr"><p>This function will be triggered when the device's connection state is changed.</p></div>
+  <div class="jd-tagdata">
+      <h5 class="jd-tagtitle">Parameters</h5>
+      <table class="jd-tagtable">
+        <tr>
+          <th>address</th>
+          <td>The device mac address</td>
+        </tr>
+        <tr>
+          <th>state</th>
+          <td>This state can be one of CONN_STATE_DISCONNECTED, CONN_STATE_CONNECTED or CONN_STATE_RECONNECTING
+</td>
+        </tr>
+      </table>
+  </div>
+
+    </div>
+</div>
+
+
+<a id="onDotDataChanged(java.lang.String, com.xsens.dot.android.sdk.events.DotData)"></a>
+
+<div class="jd-details api apilevel-"> 
+    <h4 class="jd-details-title">
+      <span class="normal">
+        public 
+         
+         
+        abstract 
+         
+        void
+      </span>
+      <span class="sympad">onDotDataChanged</span>
+      <span class="normal">(String address, <a href="../../../../../../com/xsens/dot/android/sdk/events/DotData.html">DotData</a> data)</span>
+    </h4>
+      <div class="api-level">
+        <div>
+
+</div>
+        
+  
+
+      </div>
+    <div class="jd-details-descr">
+      
+  <div class="jd-tagdata jd-tagdescr"><p>This function will be triggered when the device generates new data packet.</p></div>
+  <div class="jd-tagdata">
+      <h5 class="jd-tagtitle">Parameters</h5>
+      <table class="jd-tagtable">
+        <tr>
+          <th>address</th>
+          <td>The device mac address</td>
+        </tr>
+        <tr>
+          <th>data</th>
+          <td>The MOVELLADotData object
+</td>
+        </tr>
+      </table>
+  </div>
+
+    </div>
+</div>
+
+
+<a id="onDotFilterProfileUpdate(java.lang.String, int)"></a>
+
+<div class="jd-details api apilevel-"> 
+    <h4 class="jd-details-title">
+      <span class="normal">
+        public 
+         
+         
+        abstract 
+         
+        void
+      </span>
+      <span class="sympad">onDotFilterProfileUpdate</span>
+      <span class="normal">(String address, int filterProfileIndex)</span>
+    </h4>
+      <div class="api-level">
+        <div>
+
+</div>
+        
+  
+
+      </div>
+    <div class="jd-details-descr">
+      
+  <div class="jd-tagdata jd-tagdescr"><p>This function will be triggered when the current filter profile is get or changed.</p></div>
+  <div class="jd-tagdata">
+      <h5 class="jd-tagtitle">Parameters</h5>
+      <table class="jd-tagtable">
+        <tr>
+          <th>address</th>
+          <td>The device mac address</td>
+        </tr>
+        <tr>
+          <th>filterProfileIndex</th>
+          <td>The current filter profile index
+</td>
+        </tr>
+      </table>
+  </div>
+
+    </div>
+</div>
+
+
+<a id="onDotFirmwareVersionRead(java.lang.String, java.lang.String)"></a>
+
+<div class="jd-details api apilevel-"> 
+    <h4 class="jd-details-title">
+      <span class="normal">
+        public 
+         
+         
+        abstract 
+         
+        void
+      </span>
+      <span class="sympad">onDotFirmwareVersionRead</span>
+      <span class="normal">(String address, String version)</span>
+    </h4>
+      <div class="api-level">
+        <div>
+
+</div>
+        
+  
+
+      </div>
+    <div class="jd-details-descr">
+      
+  <div class="jd-tagdata jd-tagdescr"><p>This function will be triggered when the device version is read.</p></div>
+  <div class="jd-tagdata">
+      <h5 class="jd-tagtitle">Parameters</h5>
+      <table class="jd-tagtable">
+        <tr>
+          <th>address</th>
+          <td>The device mac address</td>
+        </tr>
+        <tr>
+          <th>version</th>
+          <td>The version number of device
+</td>
+        </tr>
+      </table>
+  </div>
+
+    </div>
+</div>
+
+
+<a id="onDotGetFilterProfileInfo(java.lang.String, java.util.ArrayList<com.xsens.dot.android.sdk.models.FilterProfileInfo>)"></a>
+
+<div class="jd-details api apilevel-"> 
+    <h4 class="jd-details-title">
+      <span class="normal">
+        public 
+         
+         
+        abstract 
+         
+        void
+      </span>
+      <span class="sympad">onDotGetFilterProfileInfo</span>
+      <span class="normal">(String address, ArrayList&lt;<a href="../../../../../../com/xsens/dot/android/sdk/models/FilterProfileInfo.html">FilterProfileInfo</a>&gt; filterProfileInfoList)</span>
+    </h4>
+      <div class="api-level">
+        <div>
+
+</div>
+        
+  
+
+      </div>
+    <div class="jd-details-descr">
+      
+  <div class="jd-tagdata jd-tagdescr"><p>This function will be triggered when the filter profile properties are get.</p></div>
+  <div class="jd-tagdata">
+      <h5 class="jd-tagtitle">Parameters</h5>
+      <table class="jd-tagtable">
+        <tr>
+          <th>address</th>
+          <td>The device mac address</td>
+        </tr>
+        <tr>
+          <th>filterProfileInfoList</th>
+          <td>The filter profile properties
+</td>
+        </tr>
+      </table>
+  </div>
+
+    </div>
+</div>
+
+
+<a id="onDotInitDone(java.lang.String)"></a>
+
+<div class="jd-details api apilevel-"> 
+    <h4 class="jd-details-title">
+      <span class="normal">
+        public 
+         
+         
+        abstract 
+         
+        void
+      </span>
+      <span class="sympad">onDotInitDone</span>
+      <span class="normal">(String address)</span>
+    </h4>
+      <div class="api-level">
+        <div>
+
+</div>
+        
+  
+
+      </div>
+    <div class="jd-details-descr">
+      
+  <div class="jd-tagdata jd-tagdescr"><p>This function will be triggered when the initial progress of connected device is done.</p></div>
+  <div class="jd-tagdata">
+      <h5 class="jd-tagtitle">Parameters</h5>
+      <table class="jd-tagtable">
+        <tr>
+          <th>address</th>
+          <td>The device mac address
+</td>
+        </tr>
+      </table>
+  </div>
+
+    </div>
+</div>
+
+
+<a id="onDotOutputRateUpdate(java.lang.String, int)"></a>
+
+<div class="jd-details api apilevel-"> 
+    <h4 class="jd-details-title">
+      <span class="normal">
+        public 
+         
+         
+        abstract 
+         
+        void
+      </span>
+      <span class="sympad">onDotOutputRateUpdate</span>
+      <span class="normal">(String address, int outputRate)</span>
+    </h4>
+      <div class="api-level">
+        <div>
+
+</div>
+        
+  
+
+      </div>
+    <div class="jd-details-descr">
+      
+  <div class="jd-tagdata jd-tagdescr"><p>This function will be triggered when the current output rate is get or changed.</p></div>
+  <div class="jd-tagdata">
+      <h5 class="jd-tagtitle">Parameters</h5>
+      <table class="jd-tagtable">
+        <tr>
+          <th>address</th>
+          <td>The device mac address</td>
+        </tr>
+        <tr>
+          <th>outputRate</th>
+          <td>The current output rate
+</td>
+        </tr>
+      </table>
+  </div>
+
+    </div>
+</div>
+
+
+<a id="onDotPowerSavingTriggered(java.lang.String)"></a>
+
+<div class="jd-details api apilevel-"> 
+    <h4 class="jd-details-title">
+      <span class="normal">
+        public 
+         
+         
+        abstract 
+         
+        void
+      </span>
+      <span class="sympad">onDotPowerSavingTriggered</span>
+      <span class="normal">(String address)</span>
+    </h4>
+      <div class="api-level">
+        <div>
+
+</div>
+        
+  
+
+      </div>
+    <div class="jd-details-descr">
+      
+  <div class="jd-tagdata jd-tagdescr"><p>This function will be triggered when the device is entering power saving mode.</p></div>
+  <div class="jd-tagdata">
+      <h5 class="jd-tagtitle">Parameters</h5>
+      <table class="jd-tagtable">
+        <tr>
+          <th>address</th>
+          <td>The device mac address
+</td>
+        </tr>
+      </table>
+  </div>
+
+    </div>
+</div>
+
+
+<a id="onDotServicesDiscovered(java.lang.String, int)"></a>
+
+<div class="jd-details api apilevel-"> 
+    <h4 class="jd-details-title">
+      <span class="normal">
+        public 
+         
+         
+        abstract 
+         
+        void
+      </span>
+      <span class="sympad">onDotServicesDiscovered</span>
+      <span class="normal">(String address, int status)</span>
+    </h4>
+      <div class="api-level">
+        <div>
+
+</div>
+        
+  
+
+      </div>
+    <div class="jd-details-descr">
+      
+  <div class="jd-tagdata jd-tagdescr"><p>This function will be triggered after device is connected.</p></div>
+  <div class="jd-tagdata">
+      <h5 class="jd-tagtitle">Parameters</h5>
+      <table class="jd-tagtable">
+        <tr>
+          <th>address</th>
+          <td>The device mac address</td>
+        </tr>
+        <tr>
+          <th>status</th>
+          <td>This state can be GATT_SUCCESS or others error code via BluetoothGatt
+</td>
+        </tr>
+      </table>
+  </div>
+
+    </div>
+</div>
+
+
+<a id="onDotTagChanged(java.lang.String, java.lang.String)"></a>
+
+<div class="jd-details api apilevel-"> 
+    <h4 class="jd-details-title">
+      <span class="normal">
+        public 
+         
+         
+        abstract 
+         
+        void
+      </span>
+      <span class="sympad">onDotTagChanged</span>
+      <span class="normal">(String address, String tag)</span>
+    </h4>
+      <div class="api-level">
+        <div>
+
+</div>
+        
+  
+
+      </div>
+    <div class="jd-details-descr">
+      
+  <div class="jd-tagdata jd-tagdescr"><p>This function will be triggered when the device tag is changed.</p></div>
+  <div class="jd-tagdata">
+      <h5 class="jd-tagtitle">Parameters</h5>
+      <table class="jd-tagtable">
+        <tr>
+          <th>address</th>
+          <td>The device mac address</td>
+        </tr>
+        <tr>
+          <th>tag</th>
+          <td>The device tag
+</td>
+        </tr>
+      </table>
+  </div>
+
+    </div>
+</div>
+
+
+<a id="onReadRemoteRssi(java.lang.String, int)"></a>
+
+<div class="jd-details api apilevel-"> 
+    <h4 class="jd-details-title">
+      <span class="normal">
+        public 
+         
+         
+        abstract 
+         
+        void
+      </span>
+      <span class="sympad">onReadRemoteRssi</span>
+      <span class="normal">(String address, int rssi)</span>
+    </h4>
+      <div class="api-level">
+        <div>
+
+</div>
+        
+  
+
+      </div>
+    <div class="jd-details-descr">
+      
+  <div class="jd-tagdata jd-tagdescr"><p>This function will be triggered when reading rssi is successful.</p></div>
+  <div class="jd-tagdata">
+      <h5 class="jd-tagtitle">Parameters</h5>
+      <table class="jd-tagtable">
+        <tr>
+          <th>address</th>
+          <td>The device mac address</td>
+        </tr>
+        <tr>
+          <th>rssi</th>
+          <td>The received signal strength in dBm. The valid range is [-127, 126]
+</td>
+        </tr>
+      </table>
+  </div>
+
+    </div>
+</div>
+
+
+<a id="onSyncStatusUpdate(java.lang.String, boolean)"></a>
+
+<div class="jd-details api apilevel-"> 
+    <h4 class="jd-details-title">
+      <span class="normal">
+        public 
+         
+         
+        abstract 
+         
+        void
+      </span>
+      <span class="sympad">onSyncStatusUpdate</span>
+      <span class="normal">(String address, boolean isSynced)</span>
+    </h4>
+      <div class="api-level">
+        <div>
+
+</div>
+        
+  
+
+      </div>
+    <div class="jd-details-descr">
+      
+  <div class="jd-tagdata jd-tagdescr"><p>This function will be triggered when the sync status is get.</p></div>
+  <div class="jd-tagdata">
+      <h5 class="jd-tagtitle">Parameters</h5>
+      <table class="jd-tagtable">
+        <tr>
+          <th>address</th>
+          <td>The device mac address</td>
+        </tr>
+        <tr>
+          <th>isSynced</th>
+          <td>True if the device is synced
+</td>
+        </tr>
+      </table>
+  </div>
+
+    </div>
+</div>
+
+
+
+
+
+<!-- ========= METHOD DETAIL ======== -->
+
+
+
+<!-- ========= END OF CLASS DATA ========= -->
+<a id="navbar_top"></a>
+
+<div id="footer">
+Generated by <a href="http://code.google.com/p/doclava/">Doclava</a>.
+</div> <!-- end footer -->
+
+</div> <!-- jd-content -->
+
+</div><!-- end doc-content -->
+
+</div> <!-- end body-content --> 
+
+<script type="text/javascript">
+init(); /* initialize doclava-developer-docs.js */
+</script>
+
+</body>
+</html>

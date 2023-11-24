@@ -45,6 +45,10 @@
 	<false/>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Continuous Bluetooth access is required for uninterrupted communication with peripheral devices, ensuring real-time updates and data synchronization even when the app is running in the background.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>Allow this app to connect to Bluetooth devices for data synchronization and real-time tracking.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 </dict>
