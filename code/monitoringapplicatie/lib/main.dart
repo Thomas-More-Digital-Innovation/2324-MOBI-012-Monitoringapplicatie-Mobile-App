@@ -56,6 +56,8 @@ class _MyHomePageState extends State<MyHomePage> {
   // Get battery level.
   String _batteryLevel = 'Unknown battery level.';
 
+  String _movellaStatus = 'Unknown';
+
   Future<void> _getBatteryLevel() async {
     String batteryLevel;
     try {
@@ -67,6 +69,20 @@ class _MyHomePageState extends State<MyHomePage> {
 
     setState(() {
       _batteryLevel = batteryLevel;
+    });
+  }
+
+  Future<void> _getMovellaStatus() async {
+    String movellaStatus;
+    try {
+      final result = await platform.invokeMethod<String>('movella');
+      movellaStatus = '$result';
+    } on PlatformException catch (e) {
+      movellaStatus = "Failed to get movella status: '${e.message}'.";
+    }
+
+    setState(() {
+      _movellaStatus = movellaStatus;
     });
   }
 
@@ -82,6 +98,11 @@ class _MyHomePageState extends State<MyHomePage> {
               child: const Text('Get Battery Level'),
             ),
             Text(_batteryLevel),
+            ElevatedButton(
+              onPressed: _getMovellaStatus,
+              child: const Text('Get movella status'),
+            ),
+            Text(_movellaStatus),
           ],
         ),
       ),
