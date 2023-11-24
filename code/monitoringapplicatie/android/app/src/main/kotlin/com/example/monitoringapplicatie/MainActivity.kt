@@ -21,17 +21,20 @@ class MainActivity: FlutterActivity() {
     MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler {
         // This method is invoked on the main thread.
         call, result ->
-        if (call.method == "getBatteryLevel") {
-            val batteryLevel = getBatteryLevel()
+        when (call.method) {
+             "getBatteryLevel" -> {
+              val batteryLevel = getBatteryLevel()
 
-            if (batteryLevel != -1) {
-            result.success(batteryLevel)
-            } else {
-            result.error("UNAVAILABLE", "Battery level not available.", null)
-            }
-        } else {
+              if (batteryLevel != -1) {
+              result.success(batteryLevel)
+              } else {
+              result.error("UNAVAILABLE", "Battery level not available.", null)
+              }}
+              "movella" -> {result.success("shakalaka")}
+        else -> {
             result.notImplemented()
         }
+      } 
     }
   }
 

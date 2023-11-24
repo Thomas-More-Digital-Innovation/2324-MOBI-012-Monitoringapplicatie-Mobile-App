@@ -1,0 +1,248 @@
+<api>
+<package name="com.xsens.dot.android.sdk.ota"
+>
+<class name="DotOtaManager"
+ extends="OtaBluetoothGattCallback"
+ abstract="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+<constructor name="DotOtaManager"
+ type="com.xsens.dot.android.sdk.ota.DotOtaManager"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+<parameter name="context" type="Context">
+</parameter>
+<parameter name="lifecycleOwner" type="LifecycleOwner">
+</parameter>
+<parameter name="device" type="DotDevice">
+</parameter>
+<parameter name="callback" type="com.xsens.dot.android.sdk.ota.interfaces.DotOtaCallback">
+</parameter>
+</constructor>
+<method name="checkOtaRollback"
+ return="void"
+ abstract="false"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+</method>
+<method name="checkOtaRollbackAndDownload"
+ return="void"
+ abstract="false"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+</method>
+<method name="checkOtaUpdates"
+ return="void"
+ abstract="false"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+</method>
+<method name="checkOtaUpdatesAndDownload"
+ return="void"
+ abstract="false"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+</method>
+<method name="clear"
+ return="void"
+ abstract="false"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+</method>
+<method name="startOta"
+ return="boolean"
+ abstract="false"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+</method>
+<method name="stopOta"
+ return="void"
+ abstract="false"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+</method>
+</class>
+</package>
+<package name="com.xsens.dot.android.sdk.ota.interfaces"
+>
+<interface name="DotOtaCallback"
+ abstract="true"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+<method name="onOtaDownload"
+ return="void"
+ abstract="true"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+<parameter name="address" type="java.lang.String">
+</parameter>
+<parameter name="result" type="boolean">
+</parameter>
+</method>
+<method name="onOtaEnd"
+ return="void"
+ abstract="true"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+<parameter name="address" type="java.lang.String">
+</parameter>
+<parameter name="result" type="boolean">
+</parameter>
+<parameter name="errorCode" type="int">
+</parameter>
+</method>
+<method name="onOtaFileMismatch"
+ return="void"
+ abstract="true"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+<parameter name="address" type="java.lang.String">
+</parameter>
+</method>
+<method name="onOtaProgress"
+ return="void"
+ abstract="true"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+<parameter name="address" type="java.lang.String">
+</parameter>
+<parameter name="progress" type="float">
+</parameter>
+<parameter name="errorCode" type="int">
+</parameter>
+</method>
+<method name="onOtaRollback"
+ return="void"
+ abstract="true"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+<parameter name="address" type="java.lang.String">
+</parameter>
+<parameter name="result" type="boolean">
+</parameter>
+<parameter name="version" type="java.lang.String">
+</parameter>
+<parameter name="releaseNotes" type="java.lang.String">
+</parameter>
+</method>
+<method name="onOtaStart"
+ return="void"
+ abstract="true"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+<parameter name="address" type="java.lang.String">
+</parameter>
+<parameter name="result" type="boolean">
+</parameter>
+<parameter name="errorCode" type="int">
+</parameter>
+</method>
+<method name="onOtaUncharged"
+ return="void"
+ abstract="true"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+<parameter name="address" type="java.lang.String">
+</parameter>
+</method>
+<method name="onOtaUpdates"
+ return="void"
+ abstract="true"
+ native="false"
+ synchronized="false"
+ static="false"
+ final="false"
+ deprecated="not deprecated"
+ visibility="public"
+>
+<parameter name="address" type="java.lang.String">
+</parameter>
+<parameter name="result" type="boolean">
+</parameter>
+<parameter name="version" type="java.lang.String">
+</parameter>
+<parameter name="releaseNotes" type="java.lang.String">
+</parameter>
+</method>
+</interface>
+</package>
+</api>
