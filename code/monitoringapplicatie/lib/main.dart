@@ -9,3 +9,4 @@ void main() => runApp(MaterialApp(
         '/demo': (context) => const Demo(),
       },
     ));
+
