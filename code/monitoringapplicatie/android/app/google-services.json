@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "281097569077",
+    "project_id": "mobi-12",
+    "storage_bucket": "mobi-12.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:281097569077:android:f579fa164017b8733cc27c",
+        "android_client_info": {
+          "package_name": "com.example.monitoringapplicatie"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCH_4DReyj9z6e2TYpZo9S0E9JdjQwaQo8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
