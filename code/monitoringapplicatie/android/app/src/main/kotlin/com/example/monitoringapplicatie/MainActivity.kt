@@ -5,6 +5,7 @@ import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
+
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
@@ -49,6 +50,7 @@ class MainActivity: FlutterActivity(), DotScannerCallback{
               } else {
               result.error("UNAVAILABLE", "Battery level not available.", null)
               }}
+
               "movella" -> {
                   val status = initMovellaDotSdk()
                   initXsScanner()
@@ -88,6 +90,7 @@ class MainActivity: FlutterActivity(), DotScannerCallback{
 
   return batteryLevel
 }
+
 
     
 

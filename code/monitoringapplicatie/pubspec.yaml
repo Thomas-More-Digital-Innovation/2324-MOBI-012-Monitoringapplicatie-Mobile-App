@@ -40,8 +40,10 @@ dependencies:
   sqflite:
   firebase_auth: ^4.14.1
   firebase_dynamic_links: ^5.4.5
+  cloud_firestore: ^4.13.2
 
 dev_dependencies:
+
   flutter_test:
     sdk: flutter
 
