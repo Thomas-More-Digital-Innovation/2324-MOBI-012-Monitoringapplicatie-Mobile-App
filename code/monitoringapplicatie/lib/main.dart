@@ -14,4 +14,12 @@ void main() async {
       '/': (context) => const firestore_test(),
     },
   ));
+
 }
+
+//void main() => runApp(MaterialApp(
+//      initialRoute: '/',
+//      routes: {
+//        '/': (context) => const Account(),
+//      },
+//    ));
