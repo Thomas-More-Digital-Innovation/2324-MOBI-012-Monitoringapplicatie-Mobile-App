@@ -3,6 +3,7 @@
     <uses-permission android:name="android.permission.BATTERY_STATS" />
     <uses-permission android:name="android.permission.BLUETOOTH"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN"/>
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
@@ -14,6 +15,9 @@
         android:label="monitoringapplicatie"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        <service
+            android:name="ForegroundService"
+            android:foregroundServiceType="location"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"

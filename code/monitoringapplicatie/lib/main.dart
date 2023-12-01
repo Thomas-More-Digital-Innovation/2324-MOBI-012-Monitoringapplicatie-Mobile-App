@@ -8,7 +8,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   runApp(MaterialApp(
-    initialRoute: '/firestore_test',
+    initialRoute: '/demo',
     routes: {
       '/': (context) => const Account(),
       '/demo': (context) => const Demo(),

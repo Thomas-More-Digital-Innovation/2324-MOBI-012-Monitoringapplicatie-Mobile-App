@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:monitoringapplicatie/firebase_options.dart';
 import 'package:flutter/services.dart';
 import 'dart:async';
+import 'dart:convert';
 
 // Future<void> main() async {
 //   WidgetsFlutterBinding.ensureInitialized();
@@ -49,9 +50,16 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   static const platform = MethodChannel('samples.flutter.dev/battery');
 
+  List<String> _movellaStatusList = ["test1", "test2"];
   // Get battery level.
   String _batteryLevel = 'Unknown battery level.';
   String _movellaStatus = 'Unknown';
+
+  @override
+  void initState() {
+    super.initState();
+    _initMovella();
+  }
 
   Future<void> _getBatteryLevel() async {
     String batteryLevel;
@@ -67,13 +75,29 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  Future<void> _getMovellaStatus() async {
+  Future<void> _initMovella() async {
     String movellaStatus;
     try {
-      final result = await platform.invokeMethod<String>('movella');
-      movellaStatus = '$result';
+      final result = await platform.invokeMethod<String>('movella_init');
+      movellaStatus = result!;
     } on PlatformException catch (e) {
       movellaStatus = "Failed to get movella status: '${e.message}'.";
+    }
+
+    setState(() {
+      _movellaStatus = movellaStatus;
+    });
+  }
+
+  Future<void> _getMovellaStatus() async {
+    String movellaStatus;
+    List<String> movellaStatusList;
+    try {
+      final result = await platform.invokeMethod<String>('movella_BLEscan');
+      movellaStatus = "Scanning? $result";
+    } on PlatformException catch (e) {
+      movellaStatus = "Failed to get movella status: '${e.message}'.";
+      movellaStatusList = [];
     }
 
     setState(() {
@@ -85,7 +109,7 @@ class _MyHomePageState extends State<MyHomePage> {
     String movellaStatusStopped;
     try {
       final result = await platform.invokeMethod<String>('movella_stop');
-      movellaStatusStopped = '$result';
+      movellaStatusStopped = 'Scannning? $result';
     } on PlatformException catch (e) {
       movellaStatusStopped =
           "Failed to get movella status stopped: '${e.message}'.";
@@ -99,7 +123,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Material(
-      child: Center(
+      child: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -108,14 +132,36 @@ class _MyHomePageState extends State<MyHomePage> {
               child: const Text('Get Battery Level'),
             ),
             Text(_batteryLevel),
-            ElevatedButton(
-              onPressed: _getMovellaStatus,
-              child: const Text('Get movella status'),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: ElevatedButton(
+                    onPressed: _getMovellaStatus,
+                    child: const Text('Start searching'),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: ElevatedButton(
+                    onPressed: _stopMovella,
+                    child: const Text('Stop searching'),
+                  ),
+                ),
+              ],
             ),
             Text(_movellaStatus),
-            ElevatedButton(
-              onPressed: _stopMovella,
-              child: const Text('Stop searching'),
+            Expanded(
+              child: ListView.builder(
+                itemCount: _movellaStatusList.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    title: Text(_movellaStatusList[
+                        index]), //concat items from inner list
+                  );
+                },
+              ),
             ),
           ],
         ),
