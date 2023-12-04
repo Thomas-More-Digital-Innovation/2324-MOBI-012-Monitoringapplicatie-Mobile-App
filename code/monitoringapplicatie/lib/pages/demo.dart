@@ -54,6 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
   // Get battery level.
   String _batteryLevel = 'Unknown battery level.';
   String _movellaStatus = 'Unknown';
+  String _movellaMeasurementStatus = 'Unknown';
 
   @override
   void initState() {
@@ -120,6 +121,38 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  Future<void> _startMeasurement() async {
+    String movellaMeasurementStatus;
+    try {
+      final result =
+          await platform.invokeMethod<String>('movella_measurementStart');
+      movellaMeasurementStatus = 'Measurement? $result';
+    } on PlatformException catch (e) {
+      movellaMeasurementStatus =
+          "Failed to get movella measurement status stopped: '${e.message}'.";
+    }
+
+    setState(() {
+      _movellaMeasurementStatus = movellaMeasurementStatus;
+    });
+  }
+
+  Future<void> _stopMeasurement() async {
+    String movellaMeasurementStatus;
+    try {
+      final result =
+          await platform.invokeMethod<String>('movella_measurementStop');
+      movellaMeasurementStatus = 'Measurement? $result';
+    } on PlatformException catch (e) {
+      movellaMeasurementStatus =
+          "Failed to get movella measurement status stopped: '${e.message}'.";
+    }
+
+    setState(() {
+      _movellaMeasurementStatus = movellaMeasurementStatus;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -152,6 +185,26 @@ class _MyHomePageState extends State<MyHomePage> {
               ],
             ),
             Text(_movellaStatus),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: ElevatedButton(
+                    onPressed: _startMeasurement,
+                    child: const Text('Start measurement'),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: ElevatedButton(
+                    onPressed: _stopMeasurement,
+                    child: const Text('Stop measurement'),
+                  ),
+                ),
+              ],
+            ),
+            Text(_movellaMeasurementStatus),
             Expanded(
               child: ListView.builder(
                 itemCount: _movellaStatusList.length,
