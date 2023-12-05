@@ -50,11 +50,11 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   static const platform = MethodChannel('samples.flutter.dev/battery');
 
-  List<String> _movellaStatusList = ["test1", "test2"];
   // Get battery level.
   String _batteryLevel = 'Unknown battery level.';
   String _movellaStatus = 'Unknown';
   String _movellaMeasurementStatus = 'Unknown';
+  List<dynamic> _devicesList = [];
 
   @override
   void initState() {
@@ -90,15 +90,14 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  Future<void> _getMovellaStatus() async {
+  Future<void> _startMovellaBLEscan() async {
     String movellaStatus;
-    List<String> movellaStatusList;
     try {
-      final result = await platform.invokeMethod<String>('movella_BLEscan');
+      final result =
+          await platform.invokeMethod<String>('movella_startBLEscan');
       movellaStatus = "Scanning? $result";
     } on PlatformException catch (e) {
       movellaStatus = "Failed to get movella status: '${e.message}'.";
-      movellaStatusList = [];
     }
 
     setState(() {
@@ -106,11 +105,17 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  Future<void> _stopMovella() async {
+  Future<void> _stopMovellaBLEscan() async {
     String movellaStatusStopped;
+    List<dynamic> devicesList = [];
     try {
-      final result = await platform.invokeMethod<String>('movella_stop');
-      movellaStatusStopped = 'Scannning? $result';
+      final String? result =
+          await platform.invokeMethod<String>('movella_stopBLEscan');
+
+      final Map<String, dynamic> resultMap = jsonDecode(result!);
+      devicesList = jsonDecode(resultMap['devices']);
+
+      movellaStatusStopped = 'Scan completed. Discovered devices: $devicesList';
     } on PlatformException catch (e) {
       movellaStatusStopped =
           "Failed to get movella status stopped: '${e.message}'.";
@@ -118,6 +123,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     setState(() {
       _movellaStatus = movellaStatusStopped;
+      _devicesList = devicesList;
     });
   }
 
@@ -171,14 +177,14 @@ class _MyHomePageState extends State<MyHomePage> {
                 Padding(
                   padding: const EdgeInsets.all(4.0),
                   child: ElevatedButton(
-                    onPressed: _getMovellaStatus,
+                    onPressed: _startMovellaBLEscan,
                     child: const Text('Start searching'),
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(4.0),
                   child: ElevatedButton(
-                    onPressed: _stopMovella,
+                    onPressed: _stopMovellaBLEscan,
                     child: const Text('Stop searching'),
                   ),
                 ),
@@ -206,14 +212,31 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             Text(_movellaMeasurementStatus),
             Expanded(
-              child: ListView.builder(
-                itemCount: _movellaStatusList.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(_movellaStatusList[
-                        index]), //concat items from inner list
-                  );
-                },
+              child: SizedBox(
+                child: ListView.builder(
+                  itemCount: _devicesList.length,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.fromLTRB(40.0, 10.0, 40.0, 0.0),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: ListTile(
+                              title: Text(_devicesList[index]['device']),
+                              subtitle: Text(
+                                'Connection State: ${_devicesList[index]['connectionState']}',
+                              ),
+                            ),
+                          ),
+                          ElevatedButton(
+                            onPressed: _stopMeasurement,
+                            child: const Text('Connect'),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
           ],
