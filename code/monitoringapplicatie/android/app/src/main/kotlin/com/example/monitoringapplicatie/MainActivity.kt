@@ -21,6 +21,7 @@ import com.xsens.dot.android.sdk.interfaces.DotScannerCallback
 import com.xsens.dot.android.sdk.interfaces.DotDeviceCallback
 import com.xsens.dot.android.sdk.events.DotData
 import com.xsens.dot.android.sdk.models.*
+import org.json.JSONObject
 
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.le.ScanSettings
@@ -35,10 +36,12 @@ import androidx.core.app.ActivityCompat
 //gaat hij automatisch mee connecteren
 //Daarna heb ik 2 knoppen toegevoegd voor het starten en stoppen van de Real Time Measurement
 //De measurement is momenteel PAYLOAD_TYPE_HIGH_FIDELITY_WITH_MAG (zie docs bij apendix)
+//Een functie gemaakt die de list met devices convert naar json zodat ik die aan de flutter kant kan uitlezen en displayen
 
 //Wat ik graag nog wil doen
-//Code opschonen
-//Lijst op frontend(flutter) met alle gevonden devices dat je dan kunt kiezen welke je wilt connecteren
+//Aan flutter kant maken dat tijdens het searchen de list met gevonden devices automatisch update i.p.v pas wanneer je op de stop knop duwt. Ook 1 knop maken van start en stop BLE scan
+//Knop connecteren aan flutter kant maken dat hij met de juiste device connect
+//meerdere sensoren connecteren
 //Juiste data selecteren uit sensoren en kijken hoe we dit in database gaan gooien (met csv of zonder, ...)
 
 class MainActivity: FlutterActivity(), DotScannerCallback, DotDeviceCallback{
@@ -61,41 +64,38 @@ class MainActivity: FlutterActivity(), DotScannerCallback, DotDeviceCallback{
         call, result ->
         when (call.method) {
           "getBatteryLevel" -> {
-          val batteryLevel = getBatteryLevel()
+            val batteryLevel = getBatteryLevel()
 
-          if (batteryLevel != -1) {
-            result.success(batteryLevel)
-          } else {
-          result.error("UNAVAILABLE", "Battery level not available.", null)
-          }}
+            if (batteryLevel != -1) {
+              result.success(batteryLevel)
+            } else {
+            result.error("UNAVAILABLE", "Battery level not available.", null)
+            }
+          }
           "movella_init" -> {
             val status = initMovellaDotSdk()
             initXsScanner()
             result.success(status)
           }
-          "movella_BLEscan" -> {
+          "movella_startBLEscan" -> {
             //check if permissions are granted
             if(checkPermissions()){
               mIsScanning = if (mXsScanner == null) false else mXsScanner!!.startScan()
             }
             result.success("$mIsScanning")
           }
-          "movella_stop" -> {
+          "movella_stopBLEscan" -> {
             mIsScanning = !mXsScanner!!.stopScan()
-            Log.i(TAG, "$mScannedSensorList")
-            result.success("$mIsScanning, $mScannedSensorList")
-            
+            result.success(convertMapToJson(mScannedSensorList))
           }
           "movella_measurementStart" -> {
             xsDevice?.setMeasurementMode(DotPayload.PAYLOAD_TYPE_HIGH_FIDELITY_WITH_MAG); 
             xsDevice?.startMeasuring();
             result.success("started")
-            
           }
           "movella_measurementStop" -> {
             xsDevice?.stopMeasuring();
             result.success("stopped")
-            
           }
         else -> {
           result.notImplemented()
@@ -104,7 +104,7 @@ class MainActivity: FlutterActivity(), DotScannerCallback, DotDeviceCallback{
     }
   }
 
-  private fun getBatteryLevel(): Int {
+private fun getBatteryLevel(): Int {
   val batteryLevel: Int
   if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
     val batteryManager = getSystemService(Context.BATTERY_SERVICE) as BatteryManager
@@ -154,6 +154,7 @@ override fun onDotScanned(device: BluetoothDevice, rssi: Int) {
   Log.i(TAG, "onDotScanned() - Name: ${device.name}, Address: ${device.address}")
   xsDevice = DotDevice(applicationContext, device, this@MainActivity)
   xsDevice?.connect();
+  
   // Your logic for handling the scanned device
   // For example, add the device to a list or perform some other action
 
@@ -170,8 +171,6 @@ override fun onDotScanned(device: BluetoothDevice, rssi: Int) {
   if (!isExist) {
       // The original connection state is Disconnected.
       // Also set tag, battery state, battery percentage to default value.
-      //kan dit zo? want dan kan ik het decoden als json aan flutter kant
-      //"$map["device"]"" : "$device"
       val map = HashMap<String, Any>()
       map["device"] = device
       map["connectionState"] = DotDevice.CONN_STATE_DISCONNECTED
@@ -180,8 +179,26 @@ override fun onDotScanned(device: BluetoothDevice, rssi: Int) {
       map["batteryPercentage"] = -1
 
       mScannedSensorList.add(map)
-      // Notify your application or perform the necessary UI update
   }
+}
+
+private fun convertMapToJson(list: ArrayList<HashMap<String, Any>>): String {
+    val jsonList = mutableListOf<JSONObject>()
+    val globalObject = JSONObject()
+
+    for (map in list) {
+        val deviceObject = JSONObject()
+
+        deviceObject.put("device", (map["device"] as BluetoothDevice?)?.address)
+        deviceObject.put("connectionState", map["connectionState"])
+        deviceObject.put("tag", map["tag"])
+        deviceObject.put("batteryState", map["batteryState"])
+        deviceObject.put("batteryPercentage", map["batteryPercentage"])
+
+        jsonList.add(deviceObject)
+    }
+    globalObject.put("devices", jsonList)
+    return globalObject.toString()
 }
 
 
