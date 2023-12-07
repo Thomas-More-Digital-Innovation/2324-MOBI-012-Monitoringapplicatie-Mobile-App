@@ -69,6 +69,7 @@ class _AccountState extends State<Account> {
     //DateTimeFormat
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         centerTitle: false,
         backgroundColor: Colors.white70,
         elevation: 100,
