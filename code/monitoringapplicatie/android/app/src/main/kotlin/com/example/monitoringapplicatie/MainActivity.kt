@@ -22,6 +22,10 @@ import com.xsens.dot.android.sdk.interfaces.DotDeviceCallback
 import com.xsens.dot.android.sdk.events.DotData
 import com.xsens.dot.android.sdk.models.*
 import org.json.JSONObject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+
 
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.le.ScanSettings
@@ -57,6 +61,8 @@ class MainActivity: FlutterActivity(), DotScannerCallback, DotDeviceCallback{
 
   private var xsDevice: DotDevice? = null
 
+  private val dotDataJSON = JSONObject()
+
   override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
     super.configureFlutterEngine(flutterEngine)
     MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler {
@@ -77,25 +83,34 @@ class MainActivity: FlutterActivity(), DotScannerCallback, DotDeviceCallback{
             initXsScanner()
             result.success(status)
           }
-          "movella_startBLEscan" -> {
-            //check if permissions are granted
-            if(checkPermissions()){
-              mIsScanning = if (mXsScanner == null) false else mXsScanner!!.startScan()
+          "movella_start_stop_BLEscan" -> {
+            if(mIsScanning){
+              mIsScanning = !mXsScanner!!.stopScan()
+            }
+            else{
+              mScannedSensorList.clear()
+              //check if permissions are granted
+              if(checkPermissions()){
+                mIsScanning = if (mXsScanner == null) false else mXsScanner!!.startScan()
+              }
             }
             result.success("$mIsScanning")
           }
-          "movella_stopBLEscan" -> {
-            mIsScanning = !mXsScanner!!.stopScan()
+          "movella_getScannedDevices" -> {
             result.success(convertMapToJson(mScannedSensorList))
           }
+          "connectSensor" -> {
+              val data = call.argument<String>("MacAddress")
+              connectToDevice("${data}")
+          }
           "movella_measurementStart" -> {
-            xsDevice?.setMeasurementMode(DotPayload.PAYLOAD_TYPE_HIGH_FIDELITY_WITH_MAG); 
+            xsDevice?.setMeasurementMode(DotPayload.PAYLOAD_TYPE_CUSTOM_MODE_4); 
             xsDevice?.startMeasuring();
             result.success("started")
           }
           "movella_measurementStop" -> {
             xsDevice?.stopMeasuring();
-            result.success("stopped")
+            result.success(listOf("stopped", dotDataJSON.toString()))
           }
         else -> {
           result.notImplemented()
@@ -116,6 +131,23 @@ private fun getBatteryLevel(): Int {
 
   return batteryLevel
 }
+
+//Denk ik pas nodig voor de geconnecte sensoren bij te houden in aparte lijst als DotDevice i.p.v bluetoothdevice
+
+// private fun getSensor(address: String): DotDevice? {
+//     val devices = mScannedSensorList
+//     Log.i(TAG, "getSensor() - devices: $devices")
+//     if (devices != null) {
+//         for (device in devices) {
+//             // Check if the device is a DotDevice and its address matches
+//             if (((device["device"] as BluetoothDevice?)?.address) == address) {
+//                 Log.i(TAG, "great succes "+((device["device"] as BluetoothDevice?)?.address).toString())
+//                 return device["device"] as DotDevice?
+//             }
+//         }
+//     }
+//     return null
+// }
 
 private fun checkPermissions(): Boolean {
   //This permission is only required in Android S or higher
@@ -152,11 +184,6 @@ private fun checkPermissions(): Boolean {
 
 override fun onDotScanned(device: BluetoothDevice, rssi: Int) {
   Log.i(TAG, "onDotScanned() - Name: ${device.name}, Address: ${device.address}")
-  xsDevice = DotDevice(applicationContext, device, this@MainActivity)
-  xsDevice?.connect();
-  
-  // Your logic for handling the scanned device
-  // For example, add the device to a list or perform some other action
 
   // Use the mac address as UID to filter the same scan result.
   
@@ -199,6 +226,19 @@ private fun convertMapToJson(list: ArrayList<HashMap<String, Any>>): String {
     }
     globalObject.put("devices", jsonList)
     return globalObject.toString()
+}
+
+private fun connectToDevice(address: String){
+  val devices = mScannedSensorList
+  if (devices != null) {
+        for (device in devices) {
+            // Check if the device is a DotDevice and its address matches
+            if (((device["device"] as BluetoothDevice?)?.address) == address) {
+                xsDevice = DotDevice(applicationContext, device["device"] as BluetoothDevice?, this@MainActivity)
+                xsDevice?.connect();
+            }
+        }
+    }
 }
 
 
@@ -261,12 +301,41 @@ override fun onDotTagChanged(address: String, tag: String) {
     }
 
 override fun onDotDataChanged(address: String, data: DotData) {
-        Log.i(TAG, "onXsensDotDataChanged() - address = $address")
+    Log.i(TAG, "onXsensDotDataChanged() - address = $address")
 
-        // Don't use LiveData variable to transfer data to activity/fragment.
-        // The main (UI) thread isn't fast enough to store data by 60Hz.
-        // if (mDataChangeInterface != null) mDataChangeInterface!!.onDataChanged(address, data)
+    val acc: DoubleArray = data.acc
+    val gyr: DoubleArray = data.gyr
+    val dq: DoubleArray = data.dq
+    val dv: DoubleArray = data.dv
+    val mag: DoubleArray = data.mag
+    val quat: FloatArray = data.quat
+    val sampleTimeFine: Long = data.sampleTimeFine
+    val packetCounter: Int = data.packetCounter
+
+    
+    val tempJSON = JSONObject()
+
+    tempJSON.put("acc", acc.contentToString())
+    tempJSON.put("gyr", gyr.contentToString())
+    tempJSON.put("dq", dq.contentToString())
+    tempJSON.put("dv", dv.contentToString())
+    tempJSON.put("mag", mag.contentToString())
+    tempJSON.put("quat", quat.contentToString())
+    tempJSON.put("sampleTimeFine", sampleTimeFine.toString())
+    tempJSON.put("packetCounter", packetCounter.toString())
+
+    val jsonList = mutableListOf<JSONObject>()
+    jsonList.add(tempJSON)
+
+    if (dotDataJSON.has(address)) {
+        val tempList = dotDataJSON.get(address) as MutableList<JSONObject>
+        tempList.addAll(jsonList)
+        dotDataJSON.put(address, tempList)
+    } else {
+        dotDataJSON.put(address, jsonList)
     }
+}
+
 
 override fun onDotBatteryChanged(address: String, status: Int, percentage: Int) {
         // This callback function will be triggered in the connection precess.
