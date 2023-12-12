@@ -1,28 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:monitoringapplicatie/pages/account.dart';
-import 'package:monitoringapplicatie/pages/demo.dart';
-import 'package:monitoringapplicatie/pages/firestore_test.dart';
 
-class Wrapper extends StatefulWidget {
-  const Wrapper({super.key});
+class NavBar extends StatefulWidget {
+  final Widget? child;
+
+  const NavBar({super.key, this.child});
 
   @override
-  State<Wrapper> createState() => _WrapperState();
+  State<NavBar> createState() => _NavBarState();
 }
 
-class _WrapperState extends State<Wrapper> {
-  String gebruikersnaam = '';
-  String email = '';
-  DateTime laatstedata = DateTime.now();
+class _NavBarState extends State<NavBar> {
   bool menuIsOpen = false;
 
   int _currentIndex = 0;
-
-  final List<Widget> _children = [
-    const Account(),
-    const Demo(),
-    const firestore_test()
-  ];
 
   String toggleMenu() {
     setState(() {
@@ -46,7 +36,7 @@ class _WrapperState extends State<Wrapper> {
         ListTile(
           title: Text(_routes[i]['name']),
           onTap: () {
-            // Navigator.pushNamed(context, _routes[i]['route']);
+            Navigator.pushNamed(context, _routes[i]['route']);
             _currentIndex = i;
             toggleMenu();
           },
@@ -103,6 +93,6 @@ class _WrapperState extends State<Wrapper> {
                 visible: menuIsOpen, child: Column(children: _menuItems()))
           ]),
         ),
-        body: _children[_currentIndex]);
+        body: widget.child);
   }
 }
