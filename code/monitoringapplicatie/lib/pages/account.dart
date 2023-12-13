@@ -31,7 +31,6 @@ class _AccountState extends State<Account> {
   void submit() {
     Navigator.of(context).pop();
   }
-
   // Use the list of widgets to create a drawer
 
   @override
