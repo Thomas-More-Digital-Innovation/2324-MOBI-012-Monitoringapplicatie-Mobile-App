@@ -57,6 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String _movellaScanStatus = 'Start Scanning';
   String _movellaMeasurementStatus = 'Unknown';
   bool _isScanning = false;
+
   List<dynamic> _devicesList = [];
 
   @override
@@ -110,18 +111,20 @@ class _MyHomePageState extends State<MyHomePage> {
     String movellaScanStatus;
     bool isScanning = false;
     try {
-      final result =
-          await platform.invokeMethod<String>('movella_start_stop_BLEscan');
+      //result[0] = returns "true" if it is scanning
+      //result[1] = return the status
+      final result = await platform
+          .invokeMethod<List<Object?>>('movella_start_stop_BLEscan');
 
       //If scanning -> text on button = "Stop Scanning"
-      if (result == "true") {
+      if (result![0] == "true") {
         movellaScanStatus = "Stop Scanning";
         isScanning = true;
       } else {
         isScanning = false;
         movellaScanStatus = "Start Scanning";
       }
-      movellaStatus = "Successfully scanning";
+      movellaStatus = result[1].toString();
     } on PlatformException catch (e) {
       movellaStatus = "Failed to BLE scan: '${e.message}'.";
       movellaScanStatus = "Failed";
@@ -146,10 +149,7 @@ class _MyHomePageState extends State<MyHomePage> {
         final Map<String, dynamic> resultMap = jsonDecode(result!);
         devicesList = jsonDecode(resultMap['devices']);
 
-        movellaStatus = 'Scan completed.';
-
         setState(() {
-          _movellaStatus = movellaStatus;
           _devicesList = devicesList;
         });
 
@@ -157,18 +157,62 @@ class _MyHomePageState extends State<MyHomePage> {
             const Duration(seconds: 1)); // Adjust the delay as needed
       }
     } on PlatformException catch (e) {
-      movellaStatus = "Failed to get movella status stopped: '${e.message}'.";
+      movellaStatus = "Failed to get scanned devices: '${e.message}'.";
       setState(() {
         _movellaStatus = movellaStatus;
       });
     }
   }
 
-  Future<void> _connectSensor(String data) async {
+  Future<void> _refreshData() async {
+    List<dynamic> devicesList = [];
+
+    final String? result =
+        await platform.invokeMethod<String>('movella_getScannedDevices');
+
+    final Map<String, dynamic> resultMap = jsonDecode(result!);
+    devicesList = jsonDecode(resultMap['devices']);
+
+    setState(() {
+      _devicesList = devicesList;
+    });
+  }
+
+  //While he is connecting we are going to get the sensor data like connectionstate so we can check if it is connected/disconnected
+  Future<void> _getConnectionState(
+      String macAddress, int connectionState) async {
+    String movellaStatus;
+    List<dynamic> devicesList = [];
+    bool isChangingConnectionState = true;
+
     try {
-      await platform.invokeMethod('connectSensor', {'MacAddress': data});
-    } catch (e) {
-      debugPrint('Error connecting sensor: $e');
+      while (isChangingConnectionState) {
+        final String? result =
+            await platform.invokeMethod<String>('movella_getScannedDevices');
+
+        final Map<String, dynamic> resultMap = jsonDecode(result!);
+        devicesList = jsonDecode(resultMap['devices']);
+
+        dynamic targetDevice = devicesList.firstWhere((device) {
+          return device['device'] == macAddress;
+        }, orElse: () => null);
+
+        setState(() {
+          _devicesList = devicesList;
+        });
+
+        //if it is stopped with "connecting" we are going to stop getting the sensor data ('1' means connecting)
+        if (targetDevice["connectionState"] != 1) {
+          Future.delayed(const Duration(seconds: 3)).then((_) =>
+              isChangingConnectionState =
+                  false); // Wait 3 seconds before stop getting the data of the sensors because we are also getting data like battery percentage which takes some time
+        }
+      }
+    } on PlatformException catch (e) {
+      movellaStatus = "Failed to get scanned devices: '${e.message}'.";
+      setState(() {
+        _movellaStatus = movellaStatus;
+      });
     }
   }
 
@@ -252,6 +296,21 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  String _getTranslatedConnectionState(int connectionState) {
+    switch (connectionState) {
+      case 0:
+        return "Disconnected";
+      case 1:
+        return "Connecting";
+      case 2:
+        return "Connected";
+      case 3 | 4 | 5:
+        return "Reconnecting";
+      default:
+        return "null";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -297,6 +356,18 @@ class _MyHomePageState extends State<MyHomePage> {
               ],
             ),
             Text(_movellaMeasurementStatus),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: ElevatedButton(
+                    onPressed: _refreshData,
+                    child: const Text("refresh"),
+                  ),
+                ),
+              ],
+            ),
             Expanded(
               child: SizedBox(
                 child: ListView.builder(
@@ -309,16 +380,34 @@ class _MyHomePageState extends State<MyHomePage> {
                           Expanded(
                             child: ListTile(
                               title: Text(_devicesList[index]['device']),
-                              subtitle: Text(
-                                'Connection State: ${_devicesList[index]['connectionState']}',
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Connection State: ${_getTranslatedConnectionState(_devicesList[index]['connectionState'])}',
+                                  ),
+                                  if (_devicesList[index]
+                                          ['batteryPercentage'] !=
+                                      -1)
+                                    Text(
+                                      'Battery Percentage: ${_devicesList[index]['batteryPercentage']}%',
+                                    ),
+                                ],
                               ),
                             ),
                           ),
-                          ElevatedButton(
-                            onPressed: () =>
-                                _connectSensor(_devicesList[index]['device']),
-                            child: const Text('Connect'),
-                          ),
+                          if (_devicesList[index]['connectionState'] == 0)
+                            ElevatedButton(
+                              onPressed: () => {
+                                platform.invokeMethod('connectSensor', {
+                                  'MacAddress': _devicesList[index]['device']
+                                }),
+                                _getConnectionState(
+                                    _devicesList[index]['device'],
+                                    _devicesList[index]['connectionState'])
+                              },
+                              child: const Text("Connect"),
+                            ),
                         ],
                       ),
                     );

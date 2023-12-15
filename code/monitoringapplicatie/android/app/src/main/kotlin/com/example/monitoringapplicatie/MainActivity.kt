@@ -28,25 +28,37 @@ import kotlinx.coroutines.launch
 
 
 import android.bluetooth.BluetoothDevice
+import android.bluetooth.BluetoothAdapter
 import android.bluetooth.le.ScanSettings
 import android.content.pm.PackageManager
 import android.Manifest
 import android.os.Build
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.MutableLiveData
+
+//Het doel is dat aan de kotlin kant enkel bluetooth data wordt verstuurd en eventueel status of het gelukt is / waarom het niet gelukt is
+//Aan de flutter kant gaan we de data handellen en de status afbeelden
 
 //Voorlopige status:
 //2 knoppen op scherm om het bluetooth scanning aan en uit te zetten.
-//Wanneer hij aan het scannen is en hij een movella dot sensor vindt
-//gaat hij automatisch mee connecteren
 //Daarna heb ik 2 knoppen toegevoegd voor het starten en stoppen van de Real Time Measurement
-//De measurement is momenteel PAYLOAD_TYPE_HIGH_FIDELITY_WITH_MAG (zie docs bij apendix)
+//De measurement is momenteel DotPayload.PAYLOAD_TYPE_CUSTOM_MODE_4 (zie docs bij apendix)
 //Een functie gemaakt die de list met devices convert naar json zodat ik die aan de flutter kant kan uitlezen en displayen
+//Aan flutter dat tijdens het searchen de list met gevonden devices automatisch update. Ook 1 knop van start en stop BLE scan
+//Knop connecteren aan flutter kant dat hij met de juiste device connect
+//Data in DB
+//Connection state opvragen met refresh knop
+//Tijdens het connecteren wordt de data opgevraagd om te kijken of hij geconnecteerd geraakt + extra data dan opvragen zoals battery
 
 //Wat ik graag nog wil doen
-//Aan flutter kant maken dat tijdens het searchen de list met gevonden devices automatisch update i.p.v pas wanneer je op de stop knop duwt. Ook 1 knop maken van start en stop BLE scan
-//Knop connecteren aan flutter kant maken dat hij met de juiste device connect
 //meerdere sensoren connecteren
-//Juiste data selecteren uit sensoren en kijken hoe we dit in database gaan gooien (met csv of zonder, ...)
+//Tijdens meten een loading symbool bij de devices die data aan het zenden zijn
+//code opruimen
+//??disconnect functionaliteit fixen
+
+//probleem
+//De "DotDevice.disconnect()" werkt niet dus voorlopige fix is gewoon de sensor uitzetten en dan disconnect hij direct automatisch
+//Ook "DotDevice.cancelReconnecting(); werkt niet daarom heb ik: DotSdk.setReconnectEnabled(false); gezet anders blijft hij constant reconnecten
 
 class MainActivity: FlutterActivity(), DotScannerCallback, DotDeviceCallback{
   private val CHANNEL = "samples.flutter.dev/battery"
@@ -56,8 +68,11 @@ class MainActivity: FlutterActivity(), DotScannerCallback, DotDeviceCallback{
   // A variable for scanning flag
   private var mIsScanning = false
 
-  // A list contains scanned Bluetooth device
+  // A list contains scanned Bluetooth devices -> so you can easily get data in the frontend (because Flutter doesn't know "DotDevice")
   private val mScannedSensorList = ArrayList<HashMap<String, Any>>()
+
+  // A list contains connected XsensDotDevices
+  private val mSensorList = MutableLiveData<ArrayList<DotDevice>?>()
 
   private var xsDevice: DotDevice? = null
 
@@ -84,17 +99,33 @@ class MainActivity: FlutterActivity(), DotScannerCallback, DotDeviceCallback{
             result.success(status)
           }
           "movella_start_stop_BLEscan" -> {
-            if(mIsScanning){
-              mIsScanning = !mXsScanner!!.stopScan()
-            }
-            else{
-              mScannedSensorList.clear()
-              //check if permissions are granted
-              if(checkPermissions()){
-                mIsScanning = if (mXsScanner == null) false else mXsScanner!!.startScan()
+            if(!mIsScanning){
+              val mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+              if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
+                result.success(listOf("$mIsScanning", "Error: Please Enable Bluetooth"))
+              } else {
+                // Bluetooth is enabled 
+                //check if permissions are granted
+                if(checkPermissions()){
+                  //remove all disconnected devices from list
+                  val iterator = mScannedSensorList.iterator()
+                  while (iterator.hasNext()) {
+                      val map = iterator.next()
+                      if (map["connectionState"] == 0) {
+                          iterator.remove()
+                      }
+                  }
+                  //start scan
+                  mIsScanning = if (mXsScanner == null) false else mXsScanner!!.startScan()
+                  result.success(listOf("$mIsScanning", "Scan started"))
+                }
               }
             }
-            result.success("$mIsScanning")
+            else{
+              //stop scan
+              mIsScanning = !mXsScanner!!.stopScan()
+              result.success(listOf("$mIsScanning", "Scan stopped"))
+            }
           }
           "movella_getScannedDevices" -> {
             result.success(convertMapToJson(mScannedSensorList))
@@ -102,6 +133,8 @@ class MainActivity: FlutterActivity(), DotScannerCallback, DotDeviceCallback{
           "connectSensor" -> {
               val data = call.argument<String>("MacAddress")
               connectToDevice("${data}")
+              result.success("connected")
+
           }
           "movella_measurementStart" -> {
             xsDevice?.setMeasurementMode(DotPayload.PAYLOAD_TYPE_CUSTOM_MODE_4); 
@@ -132,22 +165,7 @@ private fun getBatteryLevel(): Int {
   return batteryLevel
 }
 
-//Denk ik pas nodig voor de geconnecte sensoren bij te houden in aparte lijst als DotDevice i.p.v bluetoothdevice
 
-// private fun getSensor(address: String): DotDevice? {
-//     val devices = mScannedSensorList
-//     Log.i(TAG, "getSensor() - devices: $devices")
-//     if (devices != null) {
-//         for (device in devices) {
-//             // Check if the device is a DotDevice and its address matches
-//             if (((device["device"] as BluetoothDevice?)?.address) == address) {
-//                 Log.i(TAG, "great succes "+((device["device"] as BluetoothDevice?)?.address).toString())
-//                 return device["device"] as DotDevice?
-//             }
-//         }
-//     }
-//     return null
-// }
 
 private fun checkPermissions(): Boolean {
   //This permission is only required in Android S or higher
@@ -209,6 +227,7 @@ override fun onDotScanned(device: BluetoothDevice, rssi: Int) {
   }
 }
 
+
 private fun convertMapToJson(list: ArrayList<HashMap<String, Any>>): String {
     val jsonList = mutableListOf<JSONObject>()
     val globalObject = JSONObject()
@@ -234,10 +253,113 @@ private fun connectToDevice(address: String){
         for (device in devices) {
             // Check if the device is a DotDevice and its address matches
             if (((device["device"] as BluetoothDevice?)?.address) == address) {
-                xsDevice = DotDevice(applicationContext, device["device"] as BluetoothDevice?, this@MainActivity)
-                xsDevice?.connect();
+                addDevice(DotDevice(applicationContext, device["device"] as BluetoothDevice?, this@MainActivity)) //add in list with connected sensors
+                DotDevice(applicationContext, device["device"] as BluetoothDevice?, this@MainActivity)?.connect(); //connect sensor
+                println(DotDevice(applicationContext, device["device"] as BluetoothDevice?, this@MainActivity)?.batteryPercentage)
             }
         }
+    }
+}
+
+// //update the data of the scanned bluetooth devices
+//  //Blijkt dat je manueel de data moet updaten van de DotDevice dus is dit niet meer nodig
+// private fun updateDataScannedDevices() {
+//   val devices = mSensorList.value
+
+//   if (devices != null) {
+//     for (connectedDevice in devices!!) {
+
+//       for (scannedDevice in mScannedSensorList){
+
+//         if(connectedDevice.address == (scannedDevice["device"] as BluetoothDevice?)?.address){
+//           // println(connectedDevice.connectionState)
+//           scannedDevice["connectionState"] = connectedDevice.connectionState
+//           scannedDevice["tag"] = connectedDevice.tag
+//           scannedDevice["batteryState"] = connectedDevice.batteryState
+//           scannedDevice["batteryPercentage"] = connectedDevice.batteryPercentage
+//         }
+//       }
+//     }
+//   }
+//   //loop door scannedDevices
+//   //loop door connectedDevices
+//   //if mac address = same dan update de data
+
+// }
+
+//.disconnect() werkt om 1 of andere reden niet
+fun disconnectSensor(address: String) {
+    if (mSensorList.value != null) {
+        for (device in mSensorList.value!!) {
+            if (device.address == address) {
+                device.disconnect()
+                println("disconnect")
+                break
+            }
+        }
+    }
+}
+
+fun disconnectAllSensors() {
+    if (mSensorList.value != null) {
+        synchronized(LOCKER) {
+            val it: Iterator<DotDevice> = mSensorList.value!!.iterator()
+            while (it.hasNext()) {
+
+                // Use Iterator to make sure it's thread safety.
+                val device = it.next()
+                device.disconnect()
+            }
+            removeAllDevice()
+        }
+    }
+}
+
+fun getSensor(address: String): DotDevice? {
+    val devices = mSensorList.value
+    if (devices != null) {
+        for (device in devices) {
+            if (device.address == address) return device
+        }
+    }
+    return null
+}
+
+private fun addDevice(xsDevice: DotDevice) {
+    if (mSensorList.value == null) mSensorList.value = ArrayList()
+    val devices = mSensorList.value
+    var isExist = false
+    for (_xsDevice in devices!!) {
+        if (xsDevice.address == _xsDevice.address) {
+            isExist = true
+            break
+        }
+    }
+    if (!isExist) devices.add(xsDevice)
+}
+
+fun removeDevice(address: String) {
+    if (mSensorList.value == null) {
+        mSensorList.value = ArrayList()
+        return
+    }
+    synchronized(LOCKER) {
+        val it = mSensorList.value!!.iterator()
+        while (it.hasNext()) {
+
+            // Use Iterator to make sure it's thread safety.
+            val device = it.next()
+            if (device.address == address) {
+                it.remove()
+                break
+            }
+        }
+    }
+}
+
+fun removeAllDevice() {
+    if (mSensorList.value != null) {
+        synchronized(LOCKER) { mSensorList.value!!.clear() }
     }
 }
 
@@ -254,7 +376,7 @@ private fun connectToDevice(address: String){
       // Enable this feature to monitor logs from SDK.
       DotSdk.setDebugEnabled(true)
       // Enable this feature then SDK will start reconnection when the connection is lost.
-      DotSdk.setReconnectEnabled(true)
+      DotSdk.setReconnectEnabled(false)
 
       return version
   }
@@ -271,14 +393,19 @@ private fun connectToDevice(address: String){
 
   override fun onDotConnectionChanged(address: String, state: Int) {
         Log.i(TAG, "onXsensDotConnectionChanged() - address = $address, state = $state")
-        // val xsDevice = getSensor(address)
-        // if (xsDevice != null) connectionChangedDevice.postValue(xsDevice)
-        // when (state) {
-        //     DotDevice.CONN_STATE_DISCONNECTED -> synchronized(this) { removeDevice(address) }
-        //     DotDevice.CONN_STATE_CONNECTING -> {}
-        //     DotDevice.CONN_STATE_CONNECTED -> {}
-        //     DotDevice.CONN_STATE_RECONNECTING -> {}
-        // }
+
+        for (scannedDevice in mScannedSensorList){
+          if((scannedDevice["device"] as BluetoothDevice?)?.address == address){
+            scannedDevice["connectionState"] = state
+          }
+        }
+        
+        when (state) {
+            DotDevice.CONN_STATE_DISCONNECTED -> synchronized(this) { removeDevice(address) }
+            DotDevice.CONN_STATE_CONNECTING -> {Log.i(TAG, "onXsensDotConnectionChanged() - address = $address, connecting")}
+            DotDevice.CONN_STATE_CONNECTED -> {Log.i(TAG, "onXsensDotConnectionChanged() - address = $address, connected")}
+            DotDevice.CONN_STATE_RECONNECTING -> {Log.i(TAG, "onXsensDotConnectionChanged() - address = $address, reconnecting")}
+        }
     }
 
 override fun onDotServicesDiscovered(address: String, status: Int) {
@@ -340,7 +467,11 @@ override fun onDotDataChanged(address: String, data: DotData) {
 override fun onDotBatteryChanged(address: String, status: Int, percentage: Int) {
         // This callback function will be triggered in the connection precess.
         Log.i(TAG, "onXsensDotBatteryChanged() - address = $address, status = $status, percentage = $percentage")
-
+        for (scannedDevice in mScannedSensorList){
+          if((scannedDevice["device"] as BluetoothDevice?)?.address == address){
+            scannedDevice["batteryPercentage"] = percentage
+          }
+        }
         // The default value of status and percentage is -1.
         // if (status != -1 && percentage != -1) {
         //     // Use callback function instead of LiveData to notify the battery information.
@@ -386,6 +517,7 @@ override fun onSyncStatusUpdate(address: String, isSynced: Boolean) {
 
   companion object {
       private val TAG = MainActivity::class.java.simpleName
+      private val LOCKER = Any()
   }
 }
 
