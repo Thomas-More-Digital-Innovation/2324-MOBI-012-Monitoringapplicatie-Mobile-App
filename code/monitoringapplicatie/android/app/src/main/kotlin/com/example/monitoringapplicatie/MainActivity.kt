@@ -49,16 +49,12 @@ import androidx.lifecycle.MutableLiveData
 //Data in DB
 //Connection state opvragen met refresh knop
 //Tijdens het connecteren wordt de data opgevraagd om te kijken of hij geconnecteerd geraakt + extra data dan opvragen zoals battery
+//meerdere sensoren loggen naar DB (probleem onze db writes van firestore zijn op)
 
 //Wat ik graag nog wil doen
-//meerdere sensoren connecteren
 //Tijdens meten een loading symbool bij de devices die data aan het zenden zijn
 //code opruimen
-//??disconnect functionaliteit fixen
-
-//probleem
-//De "DotDevice.disconnect()" werkt niet dus voorlopige fix is gewoon de sensor uitzetten en dan disconnect hij direct automatisch
-//Ook "DotDevice.cancelReconnecting(); werkt niet daarom heb ik: DotSdk.setReconnectEnabled(false); gezet anders blijft hij constant reconnecten
+//Voor op te slagen naar firestore error proberen te catchen want er kunnen 2 errors zijn: "Write stream exhausted maximum allowed queued writes" en geen internet
 
 class MainActivity: FlutterActivity(), DotScannerCallback, DotDeviceCallback{
   private val CHANNEL = "samples.flutter.dev/battery"
@@ -73,8 +69,6 @@ class MainActivity: FlutterActivity(), DotScannerCallback, DotDeviceCallback{
 
   // A list contains connected XsensDotDevices
   private val mSensorList = MutableLiveData<ArrayList<DotDevice>?>()
-
-  private var xsDevice: DotDevice? = null
 
   private val dotDataJSON = JSONObject()
 
@@ -131,18 +125,38 @@ class MainActivity: FlutterActivity(), DotScannerCallback, DotDeviceCallback{
             result.success(convertMapToJson(mScannedSensorList))
           }
           "connectSensor" -> {
+            //Data from Flutter
               val data = call.argument<String>("MacAddress")
               connectToDevice("${data}")
               result.success("connected")
-
+          }
+          "disconnectSensor" -> {
+            //Data from Flutter
+              val data = call.argument<String>("MacAddress")
+              var _xsDevice = getSensor("${data}")
+              if(_xsDevice != null){
+                _xsDevice.disconnect()
+              }
+              
+              result.success("connected")
           }
           "movella_measurementStart" -> {
-            xsDevice?.setMeasurementMode(DotPayload.PAYLOAD_TYPE_CUSTOM_MODE_4); 
-            xsDevice?.startMeasuring();
+            val devices = mSensorList.value
+            if (devices != null) {
+                for (device in devices) {
+                    device.setMeasurementMode(DotPayload.PAYLOAD_TYPE_CUSTOM_MODE_4)
+                    device.startMeasuring()
+                }
+            }
             result.success("started")
           }
           "movella_measurementStop" -> {
-            xsDevice?.stopMeasuring();
+            val devices = mSensorList.value
+            if (devices != null) {
+                for (device in devices) {
+                    device.stopMeasuring()
+                }
+            }
             result.success(listOf("stopped", dotDataJSON.toString()))
           }
         else -> {
@@ -253,16 +267,16 @@ private fun connectToDevice(address: String){
         for (device in devices) {
             // Check if the device is a DotDevice and its address matches
             if (((device["device"] as BluetoothDevice?)?.address) == address) {
-                addDevice(DotDevice(applicationContext, device["device"] as BluetoothDevice?, this@MainActivity)) //add in list with connected sensors
-                DotDevice(applicationContext, device["device"] as BluetoothDevice?, this@MainActivity)?.connect(); //connect sensor
-                println(DotDevice(applicationContext, device["device"] as BluetoothDevice?, this@MainActivity)?.batteryPercentage)
+                val _xsDevice = DotDevice(applicationContext, (device["device"]as BluetoothDevice), this@MainActivity)
+                addDevice(_xsDevice) //add in list with connected sensors
+                _xsDevice.connect(); //connect sensor
             }
         }
     }
 }
 
 // //update the data of the scanned bluetooth devices
-//  //Blijkt dat je manueel de data moet updaten van de DotDevice dus is dit niet meer nodig
+//  //Blijkt dat je manueel de data moet updaten van de DotDevice dus is dit niet meer nodig SIKE!!!!!!
 // private fun updateDataScannedDevices() {
 //   val devices = mSensorList.value
 
@@ -393,13 +407,11 @@ fun removeAllDevice() {
 
   override fun onDotConnectionChanged(address: String, state: Int) {
         Log.i(TAG, "onXsensDotConnectionChanged() - address = $address, state = $state")
-
         for (scannedDevice in mScannedSensorList){
           if((scannedDevice["device"] as BluetoothDevice?)?.address == address){
             scannedDevice["connectionState"] = state
           }
         }
-        
         when (state) {
             DotDevice.CONN_STATE_DISCONNECTED -> synchronized(this) { removeDevice(address) }
             DotDevice.CONN_STATE_CONNECTING -> {Log.i(TAG, "onXsensDotConnectionChanged() - address = $address, connecting")}
@@ -419,12 +431,6 @@ override fun onDotFirmwareVersionRead(address: String, version: String) {
 override fun onDotTagChanged(address: String, tag: String) {
         // This callback function will be triggered in the connection precess.
         Log.i(TAG, "onXsensDotTagChanged() - address = $address, tag = $tag")
-
-        // // The default value of tag is an empty string.
-        // if (tag != "") {
-        //     val device = getSensor(address)
-        //     if (device != null) tagChangedDevice.postValue(device)
-        // }
     }
 
 override fun onDotDataChanged(address: String, data: DotData) {
@@ -472,13 +478,6 @@ override fun onDotBatteryChanged(address: String, status: Int, percentage: Int) 
             scannedDevice["batteryPercentage"] = percentage
           }
         }
-        // The default value of status and percentage is -1.
-        // if (status != -1 && percentage != -1) {
-        //     // Use callback function instead of LiveData to notify the battery information.
-        //     // Because when user removes the USB cable from housing, this function will be triggered 5 times.
-        //     // Use LiveData will lose some notification.
-        //     if (mBatteryChangeInterface != null) mBatteryChangeInterface!!.onBatteryChanged(address, status, percentage)
-        // }
     }
 
 override fun onDotInitDone(address: String) {

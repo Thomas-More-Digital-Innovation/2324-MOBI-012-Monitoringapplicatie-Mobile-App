@@ -173,6 +173,8 @@ class _MyHomePageState extends State<MyHomePage> {
     final Map<String, dynamic> resultMap = jsonDecode(result!);
     devicesList = jsonDecode(resultMap['devices']);
 
+    debugPrint(devicesList.toString());
+
     setState(() {
       _devicesList = devicesList;
     });
@@ -240,6 +242,7 @@ class _MyHomePageState extends State<MyHomePage> {
       movellaMeasurementStatus = 'Measurement?${result![0]}';
 
       final Map<String, dynamic> resultMap = jsonDecode(result[1].toString());
+
       _storeData(resultMap);
     } on PlatformException catch (e) {
       movellaMeasurementStatus =
@@ -254,8 +257,6 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _storeData(Map<String, dynamic> devicesData) async {
     String movellaMeasurementStatus = "";
     var db = FirebaseFirestore.instance;
-    //Using a batch to write multiple records at once.
-    final batch = db.batch();
 
     //key = mac-address
     //value = list of all json's with data
@@ -267,30 +268,60 @@ class _MyHomePageState extends State<MyHomePage> {
     devicesData.forEach((key, value) async {
       final now = DateTime.now();
       List<dynamic> data = jsonDecode(value);
-      for (var entry in data) {
-        try {
-          batch.set(
-            db
-                .collection("sd-dummy-users")
-                .doc(
-                    "NNOc3lVy9cVuyhF60YctkMXPJw23") // needs to be replaced with user-id of the logged-in user
-                .collection("sensors")
-                .doc(key)
-                .collection(now.toString())
-                .doc(),
-            entry,
-          );
-        } catch (e) {
-          debugPrint("Error during batch set: $e");
+      var lastSessionNumber = 0;
+      debugPrint(key);
+
+      // Create a new batch for each iteration because error: "Error during batch set: Bad state: This batch has already been committed and can no longer be changed."
+      var batch = db.batch();
+
+      await db
+          .collection("sd-dummy-users")
+          .doc("NNOc3lVy9cVuyhF60YctkMXPJw23")
+          .collection("sensors")
+          .doc(key)
+          .get()
+          .then((documentSnapshot) {
+        //If already data in DB
+        if (documentSnapshot.exists) {
+          Map<String, dynamic> docData =
+              documentSnapshot.data() as Map<String, dynamic>;
+          lastSessionNumber = docData["lastSessionNumber"];
         }
-      }
+
+        for (var entry in data) {
+          try {
+            batch.set(
+              db
+                  .collection("sd-dummy-users")
+                  .doc("NNOc3lVy9cVuyhF60YctkMXPJw23")
+                  .collection("sensors")
+                  .doc(key),
+              {"lastSessionNumber": lastSessionNumber + 1},
+            );
+            batch.set(
+              db
+                  .collection("sd-dummy-users")
+                  .doc("NNOc3lVy9cVuyhF60YctkMXPJw23")
+                  .collection("sensors")
+                  .doc(key)
+                  .collection("session ${lastSessionNumber + 1}")
+                  .doc(),
+              entry,
+            );
+            lastSessionNumber += 1;
+          } catch (e) {
+            debugPrint("Error during batch set: $e");
+          }
+        }
+        print('${documentSnapshot.id} => ${lastSessionNumber.toString()}');
+      });
+      await batch.commit().then((_) {
+        movellaMeasurementStatus = "Database commit successful";
+      }).catchError((error) {
+        movellaMeasurementStatus = "Error during database commit: $error";
+      });
     });
 
-    await batch.commit().then((_) {
-      movellaMeasurementStatus = "Database commit successful";
-    }).catchError((error) {
-      movellaMeasurementStatus = "Error during database commit: $error";
-    });
     setState(() {
       _movellaMeasurementStatus = movellaMeasurementStatus;
     });
@@ -308,6 +339,36 @@ class _MyHomePageState extends State<MyHomePage> {
         return "Reconnecting";
       default:
         return "null";
+    }
+  }
+
+  ElevatedButton _getConnectionButton(int connectionState, int index) {
+    switch (connectionState) {
+      case 0:
+        return ElevatedButton(
+          onPressed: () => {
+            platform.invokeMethod(
+                'connectSensor', {'MacAddress': _devicesList[index]['device']}),
+            _getConnectionState(_devicesList[index]['device'],
+                _devicesList[index]['connectionState'])
+          },
+          child: const Text("Connect"),
+        );
+      case 2:
+        return ElevatedButton(
+          onPressed: () => {
+            platform.invokeMethod('disconnectSensor',
+                {'MacAddress': _devicesList[index]['device']}),
+            _getConnectionState(_devicesList[index]['device'],
+                _devicesList[index]['connectionState'])
+          },
+          child: const Text("Disconnect"),
+        );
+      default:
+        return ElevatedButton(
+          onPressed: null,
+          child: Text(_getTranslatedConnectionState(connectionState)),
+        );
     }
   }
 
@@ -396,18 +457,8 @@ class _MyHomePageState extends State<MyHomePage> {
                               ),
                             ),
                           ),
-                          if (_devicesList[index]['connectionState'] == 0)
-                            ElevatedButton(
-                              onPressed: () => {
-                                platform.invokeMethod('connectSensor', {
-                                  'MacAddress': _devicesList[index]['device']
-                                }),
-                                _getConnectionState(
-                                    _devicesList[index]['device'],
-                                    _devicesList[index]['connectionState'])
-                              },
-                              child: const Text("Connect"),
-                            ),
+                          _getConnectionButton(
+                              _devicesList[index]['connectionState'], index)
                         ],
                       ),
                     );
