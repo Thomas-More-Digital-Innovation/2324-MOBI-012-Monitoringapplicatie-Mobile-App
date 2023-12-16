@@ -304,7 +304,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   .doc("NNOc3lVy9cVuyhF60YctkMXPJw23")
                   .collection("sensors")
                   .doc(key)
-                  .collection("session ${lastSessionNumber + 1}")
+                  .collection("session${lastSessionNumber + 1}")
                   .doc(),
               entry,
             );
