@@ -268,7 +268,7 @@ class _MyHomePageState extends State<MyHomePage> {
     devicesData.forEach((key, value) async {
       final now = DateTime.now();
       List<dynamic> data = jsonDecode(value);
-      var lastSessionNumber = 0;
+      var lastSessionNumber = 1;
       debugPrint(key);
 
       // Create a new batch for each iteration because error: "Error during batch set: Bad state: This batch has already been committed and can no longer be changed."
@@ -285,8 +285,17 @@ class _MyHomePageState extends State<MyHomePage> {
         if (documentSnapshot.exists) {
           Map<String, dynamic> docData =
               documentSnapshot.data() as Map<String, dynamic>;
-          lastSessionNumber = docData["lastSessionNumber"];
+          lastSessionNumber = docData["lastSessionNumber"] + 1;
         }
+
+        batch.set(
+          db
+              .collection("sd-dummy-users")
+              .doc("NNOc3lVy9cVuyhF60YctkMXPJw23")
+              .collection("sensors")
+              .doc(key),
+          {"lastSessionNumber": lastSessionNumber},
+        );
 
         for (var entry in data) {
           try {
@@ -295,26 +304,18 @@ class _MyHomePageState extends State<MyHomePage> {
                   .collection("sd-dummy-users")
                   .doc("NNOc3lVy9cVuyhF60YctkMXPJw23")
                   .collection("sensors")
-                  .doc(key),
-              {"lastSessionNumber": lastSessionNumber + 1},
-            );
-            batch.set(
-              db
-                  .collection("sd-dummy-users")
-                  .doc("NNOc3lVy9cVuyhF60YctkMXPJw23")
-                  .collection("sensors")
                   .doc(key)
-                  .collection("session${lastSessionNumber + 1}")
+                  .collection("session$lastSessionNumber")
                   .doc(),
               entry,
             );
-            lastSessionNumber += 1;
           } catch (e) {
             debugPrint("Error during batch set: $e");
           }
         }
         print('${documentSnapshot.id} => ${lastSessionNumber.toString()}');
       });
+
       await batch.commit().then((_) {
         movellaMeasurementStatus = "Database commit successful";
       }).catchError((error) {
