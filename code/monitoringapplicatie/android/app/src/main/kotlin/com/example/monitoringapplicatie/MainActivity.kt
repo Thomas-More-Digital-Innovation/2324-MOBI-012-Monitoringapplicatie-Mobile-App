@@ -64,6 +64,9 @@ class MainActivity: FlutterActivity(), DotScannerCallback, DotDeviceCallback{
   // A variable for scanning flag
   private var mIsScanning = false
 
+  // A variable for measuring flag
+  private var mIsMeasuring = false
+
   // A list contains scanned Bluetooth devices -> so you can easily get data in the frontend (because Flutter doesn't know "DotDevice")
   private val mScannedSensorList = ArrayList<HashMap<String, Any>>()
 
@@ -137,28 +140,37 @@ class MainActivity: FlutterActivity(), DotScannerCallback, DotDeviceCallback{
               if(_xsDevice != null){
                 _xsDevice.disconnect()
               }
-              
               result.success("connected")
           }
-          "movella_measurementStart" -> {
+          "movella_measurementStartStop" -> {
             val devices = mSensorList.value
-            if (devices != null) {
+            if (devices != null && devices.size > 0) {
                 for (device in devices) {
+                  if(!mIsMeasuring){
                     device.setMeasurementMode(DotPayload.PAYLOAD_TYPE_CUSTOM_MODE_4)
                     device.startMeasuring()
-                }
-            }
-            result.success("started")
-          }
-          "movella_measurementStop" -> {
-            val devices = mSensorList.value
-            if (devices != null) {
-                for (device in devices) {
+                    mIsMeasuring = true
+                  }
+                  else{
                     device.stopMeasuring()
+                    mIsMeasuring = false
+                  }
                 }
+                result.success(listOf(mIsMeasuring.toString(), dotDataJSON.toString()))
             }
-            result.success(listOf("stopped", dotDataJSON.toString()))
+            else{
+              result.success(listOf("No devices found",""))
+            }
           }
+          // "movella_measurementStop" -> {
+          //   val devices = mSensorList.value
+          //   if (devices != null) {
+          //       for (device in devices) {
+          //           device.stopMeasuring()
+          //       }
+          //   }
+          //   result.success(listOf("stopped", dotDataJSON.toString()))
+          // }
         else -> {
           result.notImplemented()
         }
