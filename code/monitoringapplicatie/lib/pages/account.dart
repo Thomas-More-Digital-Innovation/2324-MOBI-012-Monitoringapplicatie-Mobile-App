@@ -10,13 +10,17 @@ class Account extends StatefulWidget {
 }
 
 class _AccountState extends State<Account> {
-  String gebruikersnaam = '';
-
-  DateTime laatstedata = DateTime.now();
-  bool menuIsOpen = false;
-
   User? user = FirebaseAuth.instance.currentUser;
-  // Use the list of widgets to create a drawer
+
+  @override
+  void initState() {
+    super.initState();
+    FirebaseAuth.instance.userChanges().listen((User? user) {
+      setState(() {
+        this.user = user;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,6 +53,11 @@ class _AccountState extends State<Account> {
                 fontWeight: FontWeight.bold,
               ),
             ),
+
+            // If user is null, show nothing, else show username
+            Text(user != null && user!.displayName != null
+                ? user!.displayName!
+                : 'Geen gebruikersnaam ingesteld'),
             const Padding(padding: EdgeInsets.fromLTRB(0, 0, 0, 5)),
             const Padding(
               padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
@@ -78,7 +87,7 @@ class _AccountState extends State<Account> {
               ),
             ),
             const Padding(padding: EdgeInsets.fromLTRB(0, 0, 0, 5)),
-            const Text(""), //Just an example
+            const Text("N.v.t"), //Just an example
             const Padding(
               padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
               child: Divider(
@@ -86,32 +95,29 @@ class _AccountState extends State<Account> {
                 height: 40,
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: SizedBox(
-                  width: 300,
-                  height: 40,
-                  child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            gebruikersnaam.isEmpty ? Colors.blue : Colors.red,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10)),
-                        ),
+            Center(
+              child: SizedBox(
+                width: 300,
+                height: 40,
+                child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      textStyle:
+                          const TextStyle(fontSize: 20, color: Colors.white),
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
                       ),
-                      onPressed: () {
-                        // Log out
-                        FirebaseAuth.instance.signOut();
-                        // Go to homepage
-                        Navigator.of(context).pop();
-                      },
-                      child: Text(
-                        'Uitloggen',
-                        style:
-                            const TextStyle(fontSize: 20, color: Colors.black),
-                      )),
-                ),
+                    ),
+                    onPressed: () {
+                      // Log out
+                      FirebaseAuth.instance.signOut();
+                      // Go to homepage
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text(
+                      'Uitloggen',
+                      style: TextStyle(fontSize: 20, color: Colors.black),
+                    )),
               ),
             )
           ],
