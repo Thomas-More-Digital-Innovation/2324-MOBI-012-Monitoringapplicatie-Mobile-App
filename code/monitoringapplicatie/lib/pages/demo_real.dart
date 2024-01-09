@@ -17,17 +17,6 @@ class DemoReal extends StatefulWidget {
   _DemoRealState createState() => _DemoRealState();
 }
 
-// Row entry
-Widget Entry(String title, String value) {
-  return Row(
-    children: [
-      Text(title),
-      const Spacer(),
-      Text(value),
-    ],
-  );
-}
-
 class _DemoRealState extends State<DemoReal> {
   static const platform = MethodChannel('samples.flutter.dev/battery');
 
@@ -37,6 +26,7 @@ class _DemoRealState extends State<DemoReal> {
   String _movellaScanStatus = 'Start Scanning';
   String _movellaMeasurementStatus = 'Start Measurement';
   bool _isScanning = false;
+  bool _isMeasuring = false;
 
   List<dynamic> _devicesList = [];
 
@@ -177,35 +167,40 @@ class _DemoRealState extends State<DemoReal> {
 
   //Function to start and stop measuring the sensor data
   Future<void> _startStopMeasurement() async {
-    String movellaMeasurementStatus = "Start Measurement";
     String movellaStatus;
+    bool isMeasuring = false;
     try {
-      final result = await platform
-          .invokeMethod<List<Object?>>('movella_measurementStartStop');
+      final resultMeasurementStatus =
+          await platform.invokeMethod<String>('movella_measurementStatus');
 
-      //result[0] = returns "true" if it is measuring
-      //result[1] = return the data measured
-      final String isMeasuring = result![0].toString();
-      //It is also posible that result[0] = "No devices found"
-      movellaStatus = result[0].toString();
+      //resultMeasurementStatus = returns "true" if it is measuring
+      //resultMeasurementStatus = return the data measured
 
-      if (isMeasuring == "false") {
-        final Map<String, dynamic> resultMap = jsonDecode(result[1].toString());
-        movellaMeasurementStatus = "Start Measurement";
+      if (resultMeasurementStatus == "true") {
+        final result =
+            await platform.invokeMethod<Object?>('movella_measurementStop');
+
+        final Map<String, dynamic> resultMap = jsonDecode(result!.toString());
+
         movellaStatus = "Successful Stopped Measuring";
+        isMeasuring = false;
+
         _storeData(resultMap);
-      } else if (isMeasuring == "true") {
-        movellaMeasurementStatus = "Stop Measurement";
+      } else if (resultMeasurementStatus == "false") {
+        platform.invokeMethod<List<Object?>>('movella_measurementStart');
+
         movellaStatus = "Successful Started Measuring";
+        isMeasuring = true;
       }
+      movellaStatus = "Failed measuring";
     } on PlatformException catch (e) {
       movellaStatus =
           "Failed to get movella measurement status stopped: '${e.message}'.";
     }
 
     setState(() {
-      _movellaMeasurementStatus = movellaMeasurementStatus;
       _movellaStatus = movellaStatus;
+      _isMeasuring = isMeasuring;
     });
   }
 
@@ -322,89 +317,100 @@ class _DemoRealState extends State<DemoReal> {
                           children: [
                             const Iconify(Mdi.warning,
                                 color: Colors.white, size: 50),
-                            SizedBox(width: 20),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text("Je bent niet ingelogd.",
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 25)),
-                                const Spacer(),
-                                const Text("Je moet ingelogd zijn om data",
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 18)),
-                                const Text("te versturen naar de server.",
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 18)),
-                                const Spacer(),
-                                ElevatedButton(
-                                    child: const Text("Log in",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 22)),
-                                    onPressed: () {}),
-                              ],
+                            const SizedBox(width: 20),
+                            Flexible(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text("Je bent niet ingelogd.",
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 25)),
+                                  const Spacer(),
+                                  const Text(
+                                      "Je moet ingelogd zijn om data te versturen naar de server.",
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 18)),
+                                  const Spacer(),
+                                  ElevatedButton(
+                                      child: const Text("Log in",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 22)),
+                                      onPressed: () {}),
+                                ],
+                              ),
                             ),
                           ],
                         ))))),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(4.0),
-              child: ElevatedButton(
-                onPressed: _startStopMovellaBLEscan,
-                child: Text(_movellaScanStatus),
-              ),
-            ),
-          ],
-        ),
-        Text(_movellaStatus),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(4.0),
-              child: ElevatedButton(
-                onPressed: _startStopMeasurement,
-                child: Text(_movellaMeasurementStatus),
-              ),
-            )
-          ],
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: ElevatedButton(
-                onPressed: _refreshData,
-                child: const Text("refresh"),
-              ),
-            ),
-          ],
-        ),
-        Expanded(
-          child: SizedBox(
-            child: ListView.builder(
-              itemCount: _devicesList.length,
-              itemBuilder: (context, index) {
-                return SensorEntry(
-                  name: _devicesList[index]['name'],
-                  mac: _devicesList[index]['device'],
-                  connectionStatus: _getTranslatedConnectionState(
-                      _devicesList[index]['connectionState']),
-                  buttonOnPressed: () {
-                    platform.invokeMethod('connectSensor',
-                        {'MacAddress': _devicesList[index]['device']});
-                    _getConnectionState(_devicesList[index]['device'],
-                        _devicesList[index]['connectionState']);
-                  },
-                );
-              },
-            ),
+        const SizedBox(height: 20),
+        Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              const Text("Acties",
+                  textAlign: TextAlign.left,
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 25,
+                      color: Colors.black)),
+              DecoratedBox(
+                decoration: const BoxDecoration(
+                  border: Border(
+                      bottom: BorderSide(color: Colors.black12),
+                      top: BorderSide(color: Colors.black12)),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 10, bottom: 10),
+                  child: Row(
+                    children: [
+                      ElevatedButton(
+                          child: Text(_isScanning ? "Stop scan" : "Start scan",
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 22)),
+                          onPressed: () {
+                            _startStopMovellaBLEscan();
+                          }),
+                      const Spacer(),
+                      ElevatedButton(
+                          child: Text(
+                              _isMeasuring ? "Stop meten" : "Start meten",
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 22)),
+                          onPressed: () {
+                            _startStopMeasurement();
+                          }),
+                    ],
+                  ),
+                ),
+              )
+            ]),
+        const SizedBox(height: 20),
+        Flexible(
+          child: ListView.builder(
+            itemCount: _devicesList.length,
+            itemBuilder: (context, index) {
+              return SingleChildScrollView(
+                child: SensorEntry(
+                    name: _devicesList[index]['name'],
+                    mac: _devicesList[index]['device'],
+                    connectionStatus: _getTranslatedConnectionState(
+                        _devicesList[index]['connectionState']),
+                    buttonConnectOnPressed: () {
+                      platform.invokeMethod('connectSensor',
+                          {'MacAddress': _devicesList[index]['device']});
+                      _getConnectionState(_devicesList[index]['device'],
+                          _devicesList[index]['connectionState']);
+                    },
+                    buttonDisconnectOnPressed: () {
+                      platform.invokeMethod('disconnectSensor',
+                          {'MacAddress': _devicesList[index]['device']});
+                      _getConnectionState(_devicesList[index]['device'],
+                          _devicesList[index]['connectionState']);
+                    }),
+              );
+            },
           ),
         ),
       ]),

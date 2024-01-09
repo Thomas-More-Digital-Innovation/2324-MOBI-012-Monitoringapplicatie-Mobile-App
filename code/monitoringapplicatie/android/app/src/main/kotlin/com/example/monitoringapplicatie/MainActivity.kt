@@ -152,40 +152,37 @@ class MainActivity: FlutterActivity(), DotScannerCallback, DotDeviceCallback{
               disconnectSensor("${data}")
               result.success("connected")
           }
-          //Deze functie is om het meten van de data van de sensoren te starten en te stoppen.
-          //Als hij aan het meten is en je voert deze functie uit gaat hij stoppen en vice versa.
-          "movella_measurementStartStop" -> {
+          //Deze functie laat aan flutter weten of hij aan het meten is of niet
+          "movella_measurementStatus" -> {
+            result.success(mIsMeasuring.toString())
+          }
+          //Deze functie is om het meten van de data van de sensoren te starten.
+          "movella_measurementStart" -> {
             val devices = mSensorList.value
-            //Als er geconnecteerde sensoren zijn
-            if (devices != null && devices.size > 0) {
+            if (devices != null) {
                 for (device in devices) {
-                  if(!mIsMeasuring){
-                    //Dit is een bepaalde measurement mode dit we gebruiken. Verschillende modes geven andere data(zie documentatie movella: programming guide)
+                  //Dit is een bepaalde measurement mode dit we gebruiken. Verschillende modes geven andere data(zie documentatie movella: programming guide)
                     device.setMeasurementMode(DotPayload.PAYLOAD_TYPE_CUSTOM_MODE_4)
                     device.startMeasuring()
                     mIsMeasuring = true
-                  }
-                  else{
-                    device.stopMeasuring()
-                    mIsMeasuring = false
-                  }
                 }
-                //json met alle data van de sensor tijdens het meten. Deze wordt naar flutter gestuurd en daar wordt het in de database opgeslagen
-                result.success(listOf(mIsMeasuring.toString(), dotDataJSON.toString()))
-            }
-            else{
-              result.success(listOf("No devices found",""))
+                result.success(mIsMeasuring.toString())
+            } else{
+              result.error("ERROR", "No devices found.", null)
             }
           }
-          // "movella_measurementStop" -> {
-          //   val devices = mSensorList.value
-          //   if (devices != null) {
-          //       for (device in devices) {
-          //           device.stopMeasuring()
-          //       }
-          //   }
-          //   result.success(listOf("stopped", dotDataJSON.toString()))
-          // }
+          //Deze functie is om het meten van de data van de sensoren te stoppen.
+          "movella_measurementStop" -> {
+            val devices = mSensorList.value
+            if (devices != null) {
+                for (device in devices) {
+                    device.stopMeasuring()
+                }
+            }
+            mIsMeasuring = false
+            //json met alle data van de sensor tijdens het meten. Deze wordt naar flutter gestuurd en daar wordt het in de database opgeslagen
+            result.success(dotDataJSON.toString())
+          }
         else -> {
           result.notImplemented()
         }
