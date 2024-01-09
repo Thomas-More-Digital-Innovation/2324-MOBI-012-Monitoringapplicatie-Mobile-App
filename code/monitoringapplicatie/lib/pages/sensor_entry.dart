@@ -16,12 +16,14 @@ class SensorEntry extends StatelessWidget {
   final String name;
   final String mac;
   final SensorConnectionState connectionStatus;
+  final VoidCallback? buttonOnPressed;
 
   const SensorEntry({
     Key? key,
     required this.name,
     required this.mac,
     required this.connectionStatus,
+    this.buttonOnPressed,
   }) : super(key: key);
 
   @override
@@ -92,7 +94,10 @@ class SensorEntry extends StatelessWidget {
                   if (connectionStatus == SensorConnectionState.notPaired ||
                       connectionStatus == SensorConnectionState.disconnected)
                     ElevatedButton(
-                        child: const Text("Connect"), onPressed: () {})
+                        child: const Text("Connect"),
+                        onPressed: () {
+                          buttonOnPressed?.call();
+                        })
                 ])));
   }
 }

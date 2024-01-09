@@ -13,7 +13,7 @@ void main() async {
   runApp(MaterialApp(
     initialRoute: '/demo_real',
     routes: {
-      '/': (context) => const NavBar(child: Demo()),
+      '/': (context) => const NavBar(child: Account()),
       '/demo': (context) => const NavBar(child: Demo()),
       '/demo_real': (context) => const NavBar(child: DemoReal()),
       '/firestore_test': (context) => const NavBar(child: firestore_test()),
