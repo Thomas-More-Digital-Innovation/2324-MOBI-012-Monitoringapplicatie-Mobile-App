@@ -25,8 +25,7 @@ class _NavBarState extends State<NavBar> {
   // Create a list of routes to navigate to together with a name
   final List<Map<String, dynamic>> _routes = [
     {'name': 'Home', 'route': '/'},
-    {'name': 'Demo', 'route': '/demo'},
-    {'name': 'Firestore test', 'route': '/firestore_test'},
+    {'name': 'Account', 'route': '/account'},
   ];
 
   // Create a list of widgets to display in the drawer
