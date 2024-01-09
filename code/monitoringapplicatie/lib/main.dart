@@ -12,6 +12,17 @@ void main() async {
 
   runApp(MaterialApp(
     initialRoute: '/demo_real',
+    theme: ThemeData(
+        primarySwatch: Colors.blue,
+        elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
+          foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+              RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(5.0),
+          )),
+        ))),
     routes: {
       '/': (context) => const NavBar(child: Demo()),
       '/demo': (context) => const NavBar(child: Demo()),
