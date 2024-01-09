@@ -17,7 +17,7 @@ Future openLogin(BuildContext context) async {
           ),
         ),
       ),
-      content: Expanded(
+      content: SingleChildScrollView(
         child: Column(
           verticalDirection: VerticalDirection.down,
           children: [
@@ -84,6 +84,8 @@ Future openLogin(BuildContext context) async {
           ],
         ),
       ),
+      contentPadding:
+          const EdgeInsets.fromLTRB(16, 16, 16, 16), // Adjust padding as needed
       actions: [
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
