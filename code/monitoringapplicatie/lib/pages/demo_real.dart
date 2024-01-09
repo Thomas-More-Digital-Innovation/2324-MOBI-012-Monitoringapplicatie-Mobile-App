@@ -233,7 +233,7 @@ class _DemoRealState extends State<DemoReal> {
 
       await db
           .collection("sd-dummy-users")
-          .doc("NNOc3lVy9cVuyhF60YctkMXPJw23")
+          .doc(user!.uid)
           .collection("sensors")
           .doc(key)
           .get()
@@ -248,7 +248,7 @@ class _DemoRealState extends State<DemoReal> {
         batch.set(
           db
               .collection("sd-dummy-users")
-              .doc("NNOc3lVy9cVuyhF60YctkMXPJw23")
+              .doc(user!.uid)
               .collection("sensors")
               .doc(key),
           {"lastSessionNumber": lastSessionNumber},
@@ -263,7 +263,7 @@ class _DemoRealState extends State<DemoReal> {
             batch.set(
               db
                   .collection("sd-dummy-users")
-                  .doc("NNOc3lVy9cVuyhF60YctkMXPJw23")
+                  .doc(user!.uid)
                   .collection("sensors")
                   .doc(key)
                   .collection("session$lastSessionNumber")
@@ -383,14 +383,15 @@ class _DemoRealState extends State<DemoReal> {
                             _startStopMovellaBLEscan();
                           }),
                       const Spacer(),
-                      ElevatedButton(
-                          child: Text(
-                              _isMeasuring ? "Stop meten" : "Start meten",
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 22)),
-                          onPressed: () {
-                            _startStopMeasurement();
-                          }),
+                      if (user != null)
+                        ElevatedButton(
+                            child: Text(
+                                _isMeasuring ? "Stop meten" : "Start meten",
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 22)),
+                            onPressed: () {
+                              _startStopMeasurement();
+                            }),
                     ],
                   ),
                 ),
