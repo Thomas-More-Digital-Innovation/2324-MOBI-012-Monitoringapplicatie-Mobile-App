@@ -72,12 +72,16 @@ class MainActivity: FlutterActivity(), DotScannerCallback, DotDeviceCallback{
 
   private val dotDataJSON = JSONObject()
 
+  //Dit is de method channel die voor de communicatie naar flutter zorgt.
+  //"movella_init" is de functie naam en wat erachter staat {} voert hij uit als je "movella_init" aanspreekt aan de flutter kant.
+  //Result.success is wat hij stuurt naar flutter. Ook kun je error's maken en die gaan via result.error naar flutter.
   override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
     super.configureFlutterEngine(flutterEngine)
     MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler {
         // This method is invoked on the main thread.
         call, result ->
         when (call.method) {
+          //Deze is om de battery level van het android device op te halen. Ik gebruik dit om te kijken of de communicatie met flutter en android/ios nog werkt.
           "getBatteryLevel" -> {
             val batteryLevel = getBatteryLevel()
 
@@ -87,21 +91,26 @@ class MainActivity: FlutterActivity(), DotScannerCallback, DotDeviceCallback{
             result.error("UNAVAILABLE", "Battery level not available.", null)
             }
           }
+          //Voor we de SDK kunnen gebruiken moeten we hem initialiseren (initMovellaDotSdk)
+          //Ook moeten we de bluetooth scanner van de SDK initialiseren (initXsScanner)
           "movella_init" -> {
             val status = initMovellaDotSdk()
             initXsScanner()
             result.success(status)
           }
+          //Deze functie is om het bluetooth scannen te starten en te stoppen.
+          //Als hij aan het scannen is en je voert deze functie uit gaat hij stoppen en vice versa.
           "movella_start_stop_BLEscan" -> {
             if(!mIsScanning){
               val mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+              //Kijken of bluetooth op het android apparaat is ingeschakeld
               if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
                 result.success(listOf("$mIsScanning", "Error: Please Enable Bluetooth"))
               } else {
                 // Bluetooth is enabled 
                 //check if permissions are granted
                 if(checkPermissions()){
-                  //remove all disconnected devices from list
+                  //Als ze opnieuw gaan scannen naar de sensoren gaan we eerst degenen die niet geconnect zijn verwijderen uit de lijst van gevonden devices
                   val iterator = mScannedSensorList.iterator()
                   while (iterator.hasNext()) {
                       val map = iterator.next()
@@ -109,27 +118,30 @@ class MainActivity: FlutterActivity(), DotScannerCallback, DotDeviceCallback{
                           iterator.remove()
                       }
                   }
-                  //start scan
+                  //start bluetooth scan
                   mIsScanning = if (mXsScanner == null) false else mXsScanner!!.startScan()
                   result.success(listOf("$mIsScanning", "Scan started"))
                 }
               }
             }
             else{
-              //stop scan
+              //stop bluetooth scan
               mIsScanning = !mXsScanner!!.stopScan()
               result.success(listOf("$mIsScanning", "Scan stopped"))
             }
           }
+          //simpele functie die gewoon alle gevonden sensoren van de bluetooth scan stuurt naar flutter
           "movella_getScannedDevices" -> {
             result.success(convertMapToJson(mScannedSensorList))
           }
+          //We krijgen een macaddress van de flutter frontend en gaan dan connecteren met de sensor
           "connectSensor" -> {
             //Data from Flutter
               val data = call.argument<String>("MacAddress")
               connectToDevice("${data}")
               result.success("connected")
           }
+          //We krijgen een macaddress van de flutter frontend en gaan dan de sensor disconnecten
           "disconnectSensor" -> {
             //Data from Flutter
               val data = call.argument<String>("MacAddress")
