@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/mdi.dart';
@@ -306,7 +307,7 @@ class _DemoRealState extends State<DemoReal> {
       child: Column(children: [
         Visibility(
             // Visibility is used to hide the widget when the user is not logged in
-            visible: true,
+            visible: FirebaseAuth.instance.currentUser != null ? false : true,
             child: SizedBox(
                 height: 150,
                 child: DecoratedBox(
