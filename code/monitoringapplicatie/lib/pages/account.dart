@@ -63,7 +63,8 @@ class _AccountState extends State<Account> {
               ),
             ),
             const Padding(padding: EdgeInsets.fromLTRB(0, 0, 0, 5)),
-            Text(user!.email!),
+            // If user is null, show nothing, else show email
+            Text(user != null ? user!.email! : ''),
             const Padding(
               padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
               child: Text(
