@@ -55,7 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String _batteryLevel = 'Unknown battery level.';
   String _movellaStatus = 'Unknown';
   String _movellaScanStatus = 'Start Scanning';
-  String _movellaMeasurementStatus = 'Unknown';
+  String _movellaMeasurementStatus = 'Start Measurement';
   bool _isScanning = false;
 
   List<dynamic> _devicesList = [];
@@ -108,7 +108,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _startStopMovellaBLEscan() async {
     String movellaStatus;
-    String movellaScanStatus;
+    String movellaScanStatus = "Start Scanning";
     bool isScanning = false;
     try {
       //result[0] = returns "true" if it is scanning
@@ -127,7 +127,6 @@ class _MyHomePageState extends State<MyHomePage> {
       movellaStatus = result[1].toString();
     } on PlatformException catch (e) {
       movellaStatus = "Failed to BLE scan: '${e.message}'.";
-      movellaScanStatus = "Failed";
     }
 
     setState(() {
@@ -173,8 +172,6 @@ class _MyHomePageState extends State<MyHomePage> {
     final Map<String, dynamic> resultMap = jsonDecode(result!);
     devicesList = jsonDecode(resultMap['devices']);
 
-    debugPrint(devicesList.toString());
-
     setState(() {
       _devicesList = devicesList;
     });
@@ -218,44 +215,57 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  Future<void> _startMeasurement() async {
-    String movellaMeasurementStatus;
+  Future<void> _startStopMeasurement() async {
+    String movellaMeasurementStatus = "Start Measurement";
+    String movellaStatus;
     try {
-      final result =
-          await platform.invokeMethod<String>('movella_measurementStart');
-      movellaMeasurementStatus = 'Measurement? $result';
+      final result = await platform
+          .invokeMethod<List<Object?>>('movella_measurementStartStop');
+
+      final String isMeasuring = result![0].toString();
+      movellaStatus = result[0].toString();
+      if (isMeasuring == "false") {
+        final Map<String, dynamic> resultMap = jsonDecode(result[1].toString());
+        movellaMeasurementStatus = "Start Measurement";
+        movellaStatus = "Successful Stopped Measuring";
+        _storeData(resultMap);
+      } else if (isMeasuring == "true") {
+        movellaMeasurementStatus = "Stop Measurement";
+        movellaStatus = "Successful Started Measuring";
+      }
     } on PlatformException catch (e) {
-      movellaMeasurementStatus =
+      movellaStatus =
           "Failed to get movella measurement status stopped: '${e.message}'.";
     }
 
     setState(() {
       _movellaMeasurementStatus = movellaMeasurementStatus;
+      _movellaStatus = movellaStatus;
     });
   }
 
-  Future<void> _stopMeasurement() async {
-    String movellaMeasurementStatus;
-    try {
-      final result =
-          await platform.invokeMethod<List<Object?>>('movella_measurementStop');
-      movellaMeasurementStatus = 'Measurement?${result![0]}';
+  // Future<void> _stopMeasurement() async {
+  //   String movellaMeasurementStatus;
+  //   try {
+  //     final result =
+  //         await platform.invokeMethod<List<Object?>>('movella_measurementStop');
+  //     movellaMeasurementStatus = 'Measurement?${result![0]}';
 
-      final Map<String, dynamic> resultMap = jsonDecode(result[1].toString());
+  //     final Map<String, dynamic> resultMap = jsonDecode(result[1].toString());
 
-      _storeData(resultMap);
-    } on PlatformException catch (e) {
-      movellaMeasurementStatus =
-          "Failed to get movella measurement status stopped: '${e.message}'.";
-    }
+  //     _storeData(resultMap);
+  //   } on PlatformException catch (e) {
+  //     movellaMeasurementStatus =
+  //         "Failed to get movella measurement status stopped: '${e.message}'.";
+  //   }
 
-    setState(() {
-      _movellaMeasurementStatus = movellaMeasurementStatus;
-    });
-  }
+  //   setState(() {
+  //     _movellaMeasurementStatus = movellaMeasurementStatus;
+  //   });
+  // }
 
   Future<void> _storeData(Map<String, dynamic> devicesData) async {
-    String movellaMeasurementStatus = "";
+    String movellaStatus = "";
     var db = FirebaseFirestore.instance;
 
     //key = mac-address
@@ -266,10 +276,8 @@ class _MyHomePageState extends State<MyHomePage> {
     //    {"acc":"[4.03347615246122, -0.6100883697264956, 8.285631377517362]","gyr":"[-1.3527645969724924, -4.333649936073944, 0.3888939120004087]","dq":"[0.9999997804032954, -1.967516207778638E-4, -6.303037873068852E-4, 5.656232257110158E-5]","dv":"[0.0671381167869458, -0.01013716436824352, 0.13813818841240144]","mag":"[-0.677734375, 0.310302734375, -1.299072265625]","quat":"[0.96328723, -0.073414296, -0.1981214, -0.1656382]","sampleTimeFine":"26333434","packetCounter":"3"}
     //  ]
     devicesData.forEach((key, value) async {
-      final now = DateTime.now();
       List<dynamic> data = jsonDecode(value);
       var lastSessionNumber = 1;
-      debugPrint(key);
 
       // Create a new batch for each iteration because error: "Error during batch set: Bad state: This batch has already been committed and can no longer be changed."
       var batch = db.batch();
@@ -298,6 +306,10 @@ class _MyHomePageState extends State<MyHomePage> {
         );
 
         for (var entry in data) {
+          // Convert the entry(json) to a Map
+          Map<String, dynamic> entryMap = entry;
+          // Add a new field to the entry
+          entryMap['sessionTime'] = '${DateTime.now()}';
           try {
             batch.set(
               db
@@ -307,24 +319,23 @@ class _MyHomePageState extends State<MyHomePage> {
                   .doc(key)
                   .collection("session$lastSessionNumber")
                   .doc(),
-              entry,
+              entryMap,
             );
           } catch (e) {
             debugPrint("Error during batch set: $e");
           }
         }
-        print('${documentSnapshot.id} => ${lastSessionNumber.toString()}');
       });
 
       await batch.commit().then((_) {
-        movellaMeasurementStatus = "Database commit successful";
+        movellaStatus = "Database commit successful";
       }).catchError((error) {
-        movellaMeasurementStatus = "Error during database commit: $error";
+        movellaStatus = "Error during database commit: $error";
       });
     });
 
     setState(() {
-      _movellaMeasurementStatus = movellaMeasurementStatus;
+      _movellaStatus = movellaStatus;
     });
   }
 
@@ -404,20 +415,12 @@ class _MyHomePageState extends State<MyHomePage> {
                 Padding(
                   padding: const EdgeInsets.all(4.0),
                   child: ElevatedButton(
-                    onPressed: _startMeasurement,
-                    child: const Text('Start measurement'),
+                    onPressed: _startStopMeasurement,
+                    child: Text(_movellaMeasurementStatus),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: ElevatedButton(
-                    onPressed: _stopMeasurement,
-                    child: const Text('Stop measurement'),
-                  ),
-                ),
+                )
               ],
             ),
-            Text(_movellaMeasurementStatus),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
