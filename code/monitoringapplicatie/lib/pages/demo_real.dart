@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/mdi.dart';
+import 'package:monitoringapplicatie/pages/openLogin.dart';
 import 'package:monitoringapplicatie/pages/sensor_entry.dart'; // For Iconify Widget
 import 'package:firebase_core/firebase_core.dart';
 import 'package:monitoringapplicatie/firebase_options.dart';
@@ -30,11 +31,18 @@ class _DemoRealState extends State<DemoReal> {
 
   List<dynamic> _devicesList = [];
 
+  User? user = FirebaseAuth.instance.currentUser;
+
   @override
   void initState() {
     super.initState();
     _initMovella();
     _continuousScanning();
+    FirebaseAuth.instance.userChanges().listen((User? user) {
+      setState(() {
+        this.user = user;
+      });
+    });
   }
 
   //Function to get the scanned devices continously when button is pressed.
@@ -151,7 +159,7 @@ class _DemoRealState extends State<DemoReal> {
         });
 
         //if it is stopped with "connecting" we are going to stop getting the sensor data ('1' means connecting)
-        if (targetDevice["connectionState"] != 1) {
+        if (targetDevice != null && targetDevice["connectionState"] != 1) {
           Future.delayed(const Duration(seconds: 3)).then((_) =>
               isChangingConnectionState =
                   false); // Wait 3 seconds before stop getting the data of the sensors because we are also getting data like battery percentage which takes some time
@@ -302,7 +310,7 @@ class _DemoRealState extends State<DemoReal> {
       child: Column(children: [
         Visibility(
             // Visibility is used to hide the widget when the user is not logged in
-            visible: FirebaseAuth.instance.currentUser != null ? false : true,
+            visible: user != null ? false : true,
             child: SizedBox(
                 height: 150,
                 child: DecoratedBox(
@@ -338,7 +346,9 @@ class _DemoRealState extends State<DemoReal> {
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 22)),
-                                      onPressed: () {}),
+                                      onPressed: () {
+                                        openLogin(context);
+                                      }),
                                 ],
                               ),
                             ),
