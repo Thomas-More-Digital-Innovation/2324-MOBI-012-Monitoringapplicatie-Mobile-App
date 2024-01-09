@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:monitoringapplicatie/pages/openLogin.dart';
 
@@ -10,27 +11,11 @@ class Account extends StatefulWidget {
 
 class _AccountState extends State<Account> {
   String gebruikersnaam = '';
-  String email = '';
+
   DateTime laatstedata = DateTime.now();
   bool menuIsOpen = false;
 
-  void fillData() {
-    setState(() {
-      gebruikersnaam = "Seppe Stroobants";
-      email = "r0955288@student.thomasmore.be";
-    });
-  }
-
-  void clearData() {
-    setState(() {
-      gebruikersnaam = "";
-      email = "";
-    });
-  }
-
-  void submit() {
-    Navigator.of(context).pop();
-  }
+  User? user = FirebaseAuth.instance.currentUser;
   // Use the list of widgets to create a drawer
 
   @override
@@ -65,7 +50,6 @@ class _AccountState extends State<Account> {
               ),
             ),
             const Padding(padding: EdgeInsets.fromLTRB(0, 0, 0, 5)),
-            Text(gebruikersnaam),
             const Padding(
               padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
               child: Text(
@@ -79,7 +63,7 @@ class _AccountState extends State<Account> {
               ),
             ),
             const Padding(padding: EdgeInsets.fromLTRB(0, 0, 0, 5)),
-            Text(email),
+            Text(user!.email!),
             const Padding(
               padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
               child: Text(
@@ -93,7 +77,7 @@ class _AccountState extends State<Account> {
               ),
             ),
             const Padding(padding: EdgeInsets.fromLTRB(0, 0, 0, 5)),
-            Text(laatstedata.toString()), //Just an example
+            const Text(""), //Just an example
             const Padding(
               padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
               child: Divider(
@@ -116,12 +100,13 @@ class _AccountState extends State<Account> {
                         ),
                       ),
                       onPressed: () {
-                        gebruikersnaam.isEmpty
-                            ? openLogin(context)
-                            : clearData();
+                        // Log out
+                        FirebaseAuth.instance.signOut();
+                        // Go to homepage
+                        Navigator.of(context).pop();
                       },
                       child: Text(
-                        '${gebruikersnaam.isEmpty ? 'In' : 'Uit'}loggen',
+                        'Uitloggen',
                         style:
                             const TextStyle(fontSize: 20, color: Colors.black),
                       )),
