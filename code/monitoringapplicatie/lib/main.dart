@@ -15,7 +15,7 @@ Future<void> main() async {
   );
 
   runApp(MaterialApp(
-    initialRoute: '/demo_real',
+    initialRoute: '/',
     theme: ThemeData(
         primarySwatch: Colors.blue,
         elevatedButtonTheme: ElevatedButtonThemeData(
@@ -28,10 +28,7 @@ Future<void> main() async {
           )),
         ))),
     routes: {
-      '/': (context) => const NavBar(child: Account()),
-      '/demo': (context) => const NavBar(child: Demo()),
-      '/demo_real': (context) => const NavBar(child: DemoReal()),
-      '/firestore_test': (context) => const NavBar(child: firestore_test()),
+      '/': (context) => const NavBar(child: DemoReal()),
       '/account': (context) => const NavBar(child: Account()),
     },
   ));
