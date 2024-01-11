@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:monitoringapplicatie/pages/openLogin.dart';
 
 class NavBar extends StatefulWidget {
   final Widget? child;
@@ -11,8 +13,7 @@ class NavBar extends StatefulWidget {
 
 class _NavBarState extends State<NavBar> {
   bool menuIsOpen = false;
-
-  int _currentIndex = 0;
+  User? user = FirebaseAuth.instance.currentUser;
 
   String toggleMenu() {
     setState(() {
@@ -24,8 +25,7 @@ class _NavBarState extends State<NavBar> {
   // Create a list of routes to navigate to together with a name
   final List<Map<String, dynamic>> _routes = [
     {'name': 'Home', 'route': '/'},
-    {'name': 'Demo', 'route': '/demo'},
-    {'name': 'Firestore test', 'route': '/firestore_test'},
+    {'name': 'Account', 'route': '/account'},
   ];
 
   // Create a list of widgets to display in the drawer
@@ -37,7 +37,7 @@ class _NavBarState extends State<NavBar> {
           title: Text(_routes[i]['name']),
           onTap: () {
             Navigator.pushNamed(context, _routes[i]['route']);
-            _currentIndex = i;
+
             toggleMenu();
           },
         ),
@@ -83,11 +83,19 @@ class _NavBarState extends State<NavBar> {
                 ),
               ),
               const Spacer(),
-              const Icon(
-                Icons.account_circle,
-                color: Colors.black87,
-                size: 40.0,
-              )
+              IconButton(
+                  onPressed: () {
+                    if (FirebaseAuth.instance.currentUser != null) {
+                      Navigator.pushNamed(context, '/account');
+                    } else {
+                      openLogin(context);
+                    }
+                  },
+                  icon: const Icon(
+                    Icons.account_circle,
+                    color: Colors.black87,
+                    size: 40.0,
+                  ))
             ]),
             Visibility(
                 visible: menuIsOpen, child: Column(children: _menuItems()))

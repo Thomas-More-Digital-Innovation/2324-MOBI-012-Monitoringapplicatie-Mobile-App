@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:monitoringapplicatie/pages/openLogin.dart';
 
@@ -9,29 +10,17 @@ class Account extends StatefulWidget {
 }
 
 class _AccountState extends State<Account> {
-  String gebruikersnaam = '';
-  String email = '';
-  DateTime laatstedata = DateTime.now();
-  bool menuIsOpen = false;
+  User? user = FirebaseAuth.instance.currentUser;
 
-  void fillData() {
-    setState(() {
-      gebruikersnaam = "Seppe Stroobants";
-      email = "r0955288@student.thomasmore.be";
+  @override
+  void initState() {
+    super.initState();
+    FirebaseAuth.instance.userChanges().listen((User? user) {
+      setState(() {
+        this.user = user;
+      });
     });
   }
-
-  void clearData() {
-    setState(() {
-      gebruikersnaam = "";
-      email = "";
-    });
-  }
-
-  void submit() {
-    Navigator.of(context).pop();
-  }
-  // Use the list of widgets to create a drawer
 
   @override
   Widget build(BuildContext context) {
@@ -64,8 +53,12 @@ class _AccountState extends State<Account> {
                 fontWeight: FontWeight.bold,
               ),
             ),
+
+            // If user is null, show nothing, else show username
+            Text(user != null && user!.displayName != null
+                ? user!.displayName!
+                : 'Geen gebruikersnaam ingesteld'),
             const Padding(padding: EdgeInsets.fromLTRB(0, 0, 0, 5)),
-            Text(gebruikersnaam),
             const Padding(
               padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
               child: Text(
@@ -79,7 +72,8 @@ class _AccountState extends State<Account> {
               ),
             ),
             const Padding(padding: EdgeInsets.fromLTRB(0, 0, 0, 5)),
-            Text(email),
+            // If user is null, show nothing, else show email
+            Text(user != null ? user!.email! : ''),
             const Padding(
               padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
               child: Text(
@@ -93,7 +87,7 @@ class _AccountState extends State<Account> {
               ),
             ),
             const Padding(padding: EdgeInsets.fromLTRB(0, 0, 0, 5)),
-            Text(laatstedata.toString()), //Just an example
+            const Text("N.v.t"), //Just an example
             const Padding(
               padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
               child: Divider(
@@ -101,31 +95,29 @@ class _AccountState extends State<Account> {
                 height: 40,
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: SizedBox(
-                  width: 300,
-                  height: 40,
-                  child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            gebruikersnaam.isEmpty ? Colors.blue : Colors.red,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10)),
-                        ),
+            Center(
+              child: SizedBox(
+                width: 300,
+                height: 40,
+                child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      textStyle:
+                          const TextStyle(fontSize: 20, color: Colors.white),
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
                       ),
-                      onPressed: () {
-                        gebruikersnaam.isEmpty
-                            ? openLogin(context)
-                            : clearData();
-                      },
-                      child: Text(
-                        '${gebruikersnaam.isEmpty ? 'In' : 'Uit'}loggen',
-                        style:
-                            const TextStyle(fontSize: 20, color: Colors.black),
-                      )),
-                ),
+                    ),
+                    onPressed: () {
+                      // Log out
+                      FirebaseAuth.instance.signOut();
+                      // Go to homepage
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text(
+                      'Uitloggen',
+                      style: TextStyle(fontSize: 20, color: Colors.black),
+                    )),
               ),
             )
           ],

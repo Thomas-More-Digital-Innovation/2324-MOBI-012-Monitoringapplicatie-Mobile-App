@@ -3,6 +3,7 @@ import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/jam.dart';
 import 'package:iconify_flutter/icons/mdi.dart';
 import 'package:iconify_flutter/icons/mi.dart';
+import 'package:iconify_flutter/icons/wpf.dart';
 
 enum SensorConnectionState {
   connected,
@@ -16,12 +17,16 @@ class SensorEntry extends StatelessWidget {
   final String name;
   final String mac;
   final SensorConnectionState connectionStatus;
+  final VoidCallback? buttonConnectOnPressed;
+  final VoidCallback? buttonDisconnectOnPressed;
 
   const SensorEntry({
     Key? key,
     required this.name,
     required this.mac,
     required this.connectionStatus,
+    this.buttonConnectOnPressed,
+    this.buttonDisconnectOnPressed,
   }) : super(key: key);
 
   @override
@@ -50,19 +55,23 @@ class SensorEntry extends StatelessWidget {
                                 fontWeight: FontWeight.bold, fontSize: 24)),
                         Text(mac),
                       ])),
-                  SizedBox(width: 10),
+                  const SizedBox(width: 10),
                   // Actions
                   if (connectionStatus != SensorConnectionState.disconnected &&
                       connectionStatus != SensorConnectionState.notPaired)
                     Row(children: [
-                      Iconify(
-                        Mdi.compass,
-                        size: 30,
-                      ),
-                      SizedBox(width: 10),
+                      IconButton(
+                          onPressed: () {},
+                          icon: Iconify(
+                            Mdi.compass,
+                            color: Colors.black.withOpacity(0.2),
+                            size: 30,
+                          )),
                       SizedBox(
+                          height: 30,
                           width: 30,
                           child: SizedBox(
+                              height: 30,
                               width: 30,
                               child: Stack(
                                 children: [
@@ -86,13 +95,19 @@ class SensorEntry extends StatelessWidget {
                                   )
                                 ],
                               ))),
-                      SizedBox(width: 10),
-                      Iconify(Mi.options_vertical, size: 30),
+                      IconButton(
+                          onPressed: () {
+                            buttonDisconnectOnPressed?.call();
+                          },
+                          icon: const Iconify(Wpf.disconnected, size: 30)),
                     ]),
                   if (connectionStatus == SensorConnectionState.notPaired ||
                       connectionStatus == SensorConnectionState.disconnected)
                     ElevatedButton(
-                        child: const Text("Connect"), onPressed: () {})
+                        child: const Text("Connect"),
+                        onPressed: () {
+                          buttonConnectOnPressed?.call();
+                        })
                 ])));
   }
 }
