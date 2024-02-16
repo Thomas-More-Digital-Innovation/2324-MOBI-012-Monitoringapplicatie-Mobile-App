@@ -312,7 +312,7 @@ class _DemoRealState extends State<DemoReal> {
             // Visibility is used to hide the widget when the user is not logged in
             visible: user != null ? false : true,
             child: SizedBox(
-                height: 150,
+                height: 170,
                 child: DecoratedBox(
                     decoration: BoxDecoration(
                       color: Colors.red,
