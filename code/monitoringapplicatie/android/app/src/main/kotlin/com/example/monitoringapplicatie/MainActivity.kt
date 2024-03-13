@@ -162,7 +162,7 @@ class MainActivity: FlutterActivity(), DotScannerCallback, DotDeviceCallback{
             if (devices != null) {
                 for (device in devices) {
                   //Dit is een bepaalde measurement mode dit we gebruiken. Verschillende modes geven andere data(zie documentatie movella: programming guide)
-                    device.setMeasurementMode(DotPayload.PAYLOAD_TYPE_CUSTOM_MODE_4)
+                    device.setMeasurementMode(DotPayload.PAYLOAD_TYPE_ORIENTATION_QUATERNION)
                     device.startMeasuring()
                     mIsMeasuring = true
                 }
@@ -295,8 +295,10 @@ private fun connectToDevice(address: String){
             // Check if the device is a DotDevice and its address matches
             if (((device["device"] as BluetoothDevice?)?.address) == address) {
                 val _xsDevice = DotDevice(applicationContext, (device["device"]as BluetoothDevice), this@MainActivity)
+                //_xsDevice.setOutputRate(30)
                 addDevice(_xsDevice) //add in list with connected sensors
-                _xsDevice.connect(); //connect sensor
+                _xsDevice.connect();
+                //Log.i(TAG,_xsDevice.getCurrentOutputRate()) //connect sensor
             }
         }
     }
@@ -477,11 +479,6 @@ override fun onDotDataChanged(address: String, data: DotData) {
     Log.i(TAG, "onXsensDotDataChanged() - address = $address")
 
     //Data wordt opgehaald en in variabellen gezet
-    val acc: DoubleArray = data.acc
-    val gyr: DoubleArray = data.gyr
-    val dq: DoubleArray = data.dq
-    val dv: DoubleArray = data.dv
-    val mag: DoubleArray = data.mag
     val quat: FloatArray = data.quat
     val sampleTimeFine: Long = data.sampleTimeFine
     val packetCounter: Int = data.packetCounter
@@ -489,11 +486,6 @@ override fun onDotDataChanged(address: String, data: DotData) {
     
     val tempJSON = JSONObject()
     //data wordt in een json gezet
-    tempJSON.put("acc", acc.contentToString())
-    tempJSON.put("gyr", gyr.contentToString())
-    tempJSON.put("dq", dq.contentToString())
-    tempJSON.put("dv", dv.contentToString())
-    tempJSON.put("mag", mag.contentToString())
     tempJSON.put("quat", quat.contentToString())
     tempJSON.put("sampleTimeFine", sampleTimeFine.toString())
     tempJSON.put("packetCounter", packetCounter.toString())

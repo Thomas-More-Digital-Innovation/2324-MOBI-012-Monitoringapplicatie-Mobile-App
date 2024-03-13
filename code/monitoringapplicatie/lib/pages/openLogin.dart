@@ -64,7 +64,7 @@ Future openLogin(BuildContext context) async {
                 ),
                 SizedBox(
                   width: 400,
-                  height: 60, // Increase the height
+                  height: 60,
                   child: TextField(
                     onChanged: (value) {
                       password = value;
@@ -93,28 +93,31 @@ Future openLogin(BuildContext context) async {
             children: [
               Center(
                 child: SizedBox(
-                  width: 200,
-                  child: ElevatedButton(
+                    width: 200,
+                    child: ElevatedButton(
                       onPressed: () async {
-                        try {
-                          await FirebaseAuth.instance
-                              .signInWithEmailAndPassword(
-                            email: email,
-                            password: password,
-                          );
-                          // Close the current dialog
-                          Navigator.pop(context);
+                        if (email.isNotEmpty && password.isNotEmpty) {
+                          try {
+                            await FirebaseAuth.instance
+                                .signInWithEmailAndPassword(
+                              email: email,
+                              password: password,
+                            );
+                            // Close the current dialog
+                            Navigator.pop(context);
 
-                          debugPrint(
-                              "Aanmelding succesvol, voer hier verdere acties uit indien nodig");
-                        } catch (e) {
-                          // Er is een fout opgetreden bij de aanmelding, verwerk de fout hier
-                          debugPrint("Fout bij aanmelden: $e");
+                            debugPrint(
+                                "Aanmelding succesvol, voer hier verdere acties uit indien nodig");
+                          } catch (e) {
+                            // Er is een fout opgetreden bij de aanmelding, verwerk de fout hier
+                            debugPrint("Fout bij aanmelden: $e");
+                          }
+                        } else {
+                          debugPrint("Email en wachtwoord zijn verplicht.");
                         }
-                        //submit();
                       },
-                      child: const Text('Login')),
-                ),
+                      child: const Text('Login'),
+                    )),
               ),
               const Padding(
                 padding: EdgeInsets.fromLTRB(0, 15, 0, 0),

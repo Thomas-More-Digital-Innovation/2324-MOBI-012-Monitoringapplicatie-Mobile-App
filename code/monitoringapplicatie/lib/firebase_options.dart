@@ -17,7 +17,10 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      return web;
+      throw UnsupportedError(
+        'DefaultFirebaseOptions have not been configured for web - '
+        'you can reconfigure this by running the FlutterFire CLI again.',
+      );
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -25,7 +28,10 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        return macos;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for macos - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -43,16 +49,6 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBEWWEmntLEDFqy4taCyObSj-fiFQuzX74',
-    appId: '1:281097569077:web:e15118a28e149aa03cc27c',
-    messagingSenderId: '281097569077',
-    projectId: 'mobi-12',
-    authDomain: 'mobi-12.firebaseapp.com',
-    storageBucket: 'mobi-12.appspot.com',
-    measurementId: 'G-HG6NHJZLGK',
-  );
-
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyCH_4DReyj9z6e2TYpZo9S0E9JdjQwaQo8',
     appId: '1:281097569077:android:f579fa164017b8733cc27c',
@@ -62,15 +58,6 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDkQIN73ystR5rncY_Vn7jCXd1ueYaSctw',
-    appId: '1:281097569077:ios:36679d4b7bb56ce83cc27c',
-    messagingSenderId: '281097569077',
-    projectId: 'mobi-12',
-    storageBucket: 'mobi-12.appspot.com',
-    iosBundleId: 'com.example.monitoringapplicatie',
-  );
-
-  static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyDkQIN73ystR5rncY_Vn7jCXd1ueYaSctw',
     appId: '1:281097569077:ios:36679d4b7bb56ce83cc27c',
     messagingSenderId: '281097569077',
