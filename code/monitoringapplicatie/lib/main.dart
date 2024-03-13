@@ -10,9 +10,7 @@ import 'package:monitoringapplicatie/pages/Navbar.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   runApp(MaterialApp(
     initialRoute: '/',
@@ -30,6 +28,7 @@ Future<void> main() async {
     routes: {
       '/': (context) => const NavBar(child: DemoReal()),
       '/account': (context) => const NavBar(child: Account()),
+      '/demo': (context) => const NavBar(child: DemoReal()),
     },
   ));
 }

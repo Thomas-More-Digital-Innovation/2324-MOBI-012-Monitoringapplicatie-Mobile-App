@@ -175,12 +175,13 @@ class _DemoRealState extends State<DemoReal> {
 
   //Function to start and stop measuring the sensor data
   Future<void> _startStopMeasurement() async {
+    print("Start/Stop measurement function called");
     String movellaStatus;
     bool isMeasuring = false;
     try {
       final resultMeasurementStatus =
           await platform.invokeMethod<String>('movella_measurementStatus');
-
+      print("Result Measurement Status: $resultMeasurementStatus");
       //resultMeasurementStatus = returns "true" if it is measuring
       //resultMeasurementStatus = return the data measured
 
@@ -214,6 +215,7 @@ class _DemoRealState extends State<DemoReal> {
 
   //Function to store the data of the sensor to the database
   Future<void> _storeData(Map<String, dynamic> devicesData) async {
+    print("Storing to database");
     String movellaStatus = "";
     var db = FirebaseFirestore.instance;
 
