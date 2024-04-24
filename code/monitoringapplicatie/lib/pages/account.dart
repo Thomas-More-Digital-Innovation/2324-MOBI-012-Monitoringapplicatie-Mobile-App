@@ -76,8 +76,8 @@ class _AccountState extends State<Account> {
         // Toon foutmelding aan gebruiker
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-                "Fout bij re-authenticatie. Controleer uw huidige wachtwoord."),
+            content:
+                Text("Fout bij re-authenticatie. Controleer uw wachtwoord."),
           ),
         );
       }
