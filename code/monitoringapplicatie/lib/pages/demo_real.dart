@@ -4,8 +4,6 @@ import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/mdi.dart';
 import 'package:monitoringapplicatie/pages/openLogin.dart';
 import 'package:monitoringapplicatie/pages/sensor_entry.dart'; // For Iconify Widget
-import 'package:firebase_core/firebase_core.dart';
-import 'package:monitoringapplicatie/firebase_options.dart';
 import 'package:flutter/services.dart';
 import 'dart:async';
 import 'dart:convert';
