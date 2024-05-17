@@ -1,11 +1,9 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:monitoringapplicatie/pages/account.dart';
 import 'package:monitoringapplicatie/pages/demo.dart';
 import 'package:monitoringapplicatie/pages/demo_real.dart';
-import 'package:monitoringapplicatie/pages/firestore_test.dart';
 import 'package:monitoringapplicatie/pages/Navbar.dart';
 
 Future<void> main() async {

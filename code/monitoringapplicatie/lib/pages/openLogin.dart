@@ -1,9 +1,48 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 Future openLogin(BuildContext context) async {
   String email = '';
   String password = '';
+
+  Future<void> updateLastLoggedIn(String userId) async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('sd-dummy-users')
+          .where('userId', isEqualTo: userId)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        await querySnapshot.docs.first.reference.update({
+          'lastSignedIn': Timestamp.now(),
+        });
+      } else {
+        print('Document niet gevonden voor userId: $userId');
+      }
+    } catch (e) {
+      print("Fout bij bijwerken laatste keer aangemeld: $e");
+    }
+  }
+
+  Future<void> updateIsSignedIn(String userId, bool value) async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('sd-dummy-users')
+          .where('userId', isEqualTo: userId)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        await querySnapshot.docs.first.reference.update({
+          'isSignedIn': value,
+        });
+      } else {
+        print('Document niet gevonden voor userId: $userId');
+      }
+    } catch (e) {
+      print("Fout bij bijwerken isSignedIn: $e");
+    }
+  }
 
   return await showDialog(
     context: context,
@@ -69,6 +108,7 @@ Future openLogin(BuildContext context) async {
                     onChanged: (value) {
                       password = value;
                     },
+                    obscureText: true,
                     decoration: const InputDecoration(
                       filled: true,
                       fillColor: Color.fromARGB(255, 193, 190, 190),
@@ -102,6 +142,13 @@ Future openLogin(BuildContext context) async {
                             email: email,
                             password: password,
                           );
+                          User? user = FirebaseAuth.instance.currentUser;
+
+                          if (user != null) {
+                            await updateLastLoggedIn(user.uid);
+                            await updateIsSignedIn(user.uid, true);
+                          }
+
                           // Close the current dialog
                           Navigator.pop(context);
 

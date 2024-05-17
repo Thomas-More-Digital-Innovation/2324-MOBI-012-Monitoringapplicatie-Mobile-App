@@ -56,6 +56,25 @@ class _DemoRealState extends State<DemoReal> {
     }
   }
 
+  Future<void> updateLastDataSend(String userId) async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('sd-dummy-users')
+          .where('userId', isEqualTo: userId)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        await querySnapshot.docs.first.reference.update({
+          'lastDataSend': Timestamp.now(),
+        });
+      } else {
+        print('Document niet gevonden voor userId: $userId');
+      }
+    } catch (e) {
+      print("Fout bij bijwerken laatste keer aangemeld: $e");
+    }
+  }
+
   //Function to initialize the Movella SDK
   Future<void> _initMovella() async {
     String movellaStatus;
@@ -173,7 +192,7 @@ class _DemoRealState extends State<DemoReal> {
     }
   }
 
-  //Function to start and stop measuring the sensor data
+//Function to start and stop measuring the sensor data
   Future<void> _startStopMeasurement() async {
     String movellaStatus;
     bool isMeasuring = false;
@@ -194,6 +213,11 @@ class _DemoRealState extends State<DemoReal> {
         isMeasuring = false;
 
         _storeData(resultMap);
+
+        // Call the function to update last data send
+        if (user != null) {
+          await updateLastDataSend(user!.uid);
+        }
       } else if (resultMeasurementStatus == "false") {
         platform.invokeMethod<List<Object?>>('movella_measurementStart');
 
